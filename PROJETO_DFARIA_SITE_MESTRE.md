@@ -9,13 +9,13 @@
 2. [Regras Críticas de Contato e Telefonia (Divisão Cirúrgica de Canais)](#2-regras-críticas-de-contato-e-telefonia-divisão-cirúrgica-de-canais)
 3. [Arquitetura de Software e Pilha Tecnológica](#3-arquitetura-de-software-e-pilha-tecnológica)
 4. [Infraestrutura, Hospedagem e Configuração do Servidor (.htaccess)](#4-infraestrutura-hospedagem-e-configuração-do-servidor-htaccess)
-5. [Inventário Cirúrgico das 55 Páginas HTML e Rotas](#5-inventário-cirúrgico-das-55-páginas-html-e-rotas)
+5. [Inventário Cirúrgico das 54 Páginas HTML e Rotas](#5-inventário-cirúrgico-das-54-páginas-html-e-rotas)
    - 5.1 [Páginas Centrais e Institucionais (10 páginas)](#51-páginas-centrais-e-institucionais-10-páginas)
    - 5.2 [Página de Locação de Materiais / "Faça a Festa" (1 página)](#52-página-de-locação-de-materiais--faça-a-festa-1-página)
    - 5.3 [Hub e Páginas de Eventos (4 páginas)](#53-hub-e-páginas-de-eventos-4-páginas)
    - 5.4 [Hub e Páginas de Gastronomia Especializada (6 páginas)](#54-hub-e-páginas-de-gastronomia-especializada-6-páginas)
    - 5.5 [Hub e os 17 Cardápios Gastronômicos Oficiais (18 páginas)](#55-hub-e-os-17-cardápios-gastronômicos-oficiais-18-páginas)
-   - 5.6 [Hub Regional e Páginas de Cidades & Condomínios de Alto Padrão (14 páginas)](#56-hub-regional-e-páginas-de-cidades--condomínios-de-alto-padrão-14-páginas)
+   - 5.6 [Hub Regional e Páginas de Cidades & Condomínios de Alto Padrão (13 páginas)](#56-hub-regional-e-páginas-de-cidades--condomínios-de-alto-padrão-13-páginas)
    - 5.7 [Página 404 e Erros de Roteamento (1 página)](#57-página-404-e-erros-de-roteamento-1-página)
 6. [Catálogo Completo de Locação — D'Faria Locações](#6-catálogo-completo-de-locação--dfaria-locações)
 7. [Diretório de Ativos, Mídias e Armazenamento (__l5e e assets)](#7-diretório-de-ativos-mídias-e-armazenamento-__l5e-e-assets)
@@ -121,9 +121,9 @@ O site está preparado especificamente para o ambiente de produção **HostGator
 
 ---
 
-## 5. INVENTÁRIO CIRÚRGICO DAS 55 PÁGINAS HTML E ROTAS
+## 5. INVENTÁRIO CIRÚRGICO DAS 54 PÁGINAS HTML E ROTAS
 
-O site conta com **55 páginas HTML pré-renderizadas** categorizadas em 7 grupos estratégicos:
+O site conta com **54 páginas HTML pré-renderizadas** categorizadas em 7 grupos estratégicos:
 
 ### 5.1 Páginas Centrais e Institucionais (10 páginas)
 1. `index.html` (`/`): Página inicial com hero banner luxuoso, apresentação do chef Cristiano De Faria, gastronomia, depoimentos, formulário modal de orçamento, FAQ e rodapé.
@@ -176,7 +176,7 @@ O site conta com **55 páginas HTML pré-renderizadas** categorizadas em 7 grupo
 39. `cardapios/jantar-completo-versao-especial.html`
 40. `cardapios/jantar-tradicional-de-frango.html` (Jantar Tradicional com Strogonoff de Frango)
 
-### 5.6 Hub Regional e Páginas de Cidades & Condomínios de Alto Padrão (14 páginas)
+### 5.6 Hub Regional e Páginas de Cidades & Condomínios de Alto Padrão (13 páginas)
 41. `regioes.html` (`/regioes`): Hub com visão geográfica do atendimento regional.
 *Cidades com SEO Dedicado:*
 42. `buffet-em-cesário-lange.html` (`/buffet-em-cesario-lange`): Sede oficial.
@@ -192,10 +192,9 @@ O site conta com **55 páginas HTML pré-renderizadas** categorizadas em 7 grupo
 51. `colina-das-estrelas.html` (`/colina-das-estrelas`): Condomínio Colina das Estrelas (Tatuí).
 52. `buffet-condomínio-jatobá.html` (`/buffet-condominio-jatoba`): Condomínio Residencial Jatobá.
 53. `condominio-haras-vitória.html` (`/condominio-haras-vitoria`): Condomínio Haras Vitória.
-54. `caninho-1.html` (`/caninho-1`): Condomínio Caninho 1.
 
 ### 5.7 Página 404 e Erros de Roteamento (1 página)
-55. `404.html` (`/404`): Tratamento elegante de links não encontrados, preservando o menu e com botão de retorno à página principal.
+54. `404.html` (`/404`): Tratamento elegante de links não encontrados, preservando o menu e com botão de retorno à página principal.
 
 ---
 
@@ -234,7 +233,7 @@ O pacote de build possui **308 arquivos** totalizando aproximadamente **52.5 MB*
 
 ## 8. ESTRATÉGIA DE SEO, METADADOS E MARCAÇÃO SEMÂNTICA (SCHEMA.ORG JSON-LD)
 
-Todas as 55 páginas possuem marcação semântica profunda e padronizada no `<head>`:
+Todas as 54 páginas possuem marcação semântica profunda e padronizada no `<head>`:
 * **Canonical URL:** Sempre apontando para o domínio oficial em HTTPS sem www (ex: `https://dfariagastronomia.com.br/`).
 * **Open Graph (Facebook / WhatsApp / LinkedIn):** `og:title`, `og:description`, `og:type="website"`, `og:url`, `og:site_name`, `og:image="https://dfariagastronomia.com.br/og-dfaria.jpg"`, `og:image:width="1200"`, `og:image:height="630"`.
 * **Twitter Cards:** `twitter:card="summary_large_image"`, `twitter:title`, `twitter:description`, `twitter:image`.
