@@ -1,0 +1,1 @@
+import{n as e,t}from"./index-CLIPjaNe.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/buffet-no-ninho-verde-1`})}export{r as component};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./index-CLIPjaNe.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/cardapios/almoco-com-churrasco-e-mesa-de-frios`})}export{r as component};

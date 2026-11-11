@@ -1,0 +1,10 @@
+COMO SUBIR O SITE NO HOSTGATOR
+
+1. Faça um backup da pasta public_html atual (baixe tudo antes).
+2. Apague o conteúdo antigo de public_html.
+3. Envie o arquivo .zip para public_html e use "Extrair" no Gerenciador de Arquivos do cPanel.
+4. Confira se o arquivo .htaccess está em public_html (ative "Mostrar arquivos ocultos").
+5. Abra o site e teste: página inicial, Cardápios, uma página de cardápio, Galeria e o formulário de orçamento.
+
+O formulário de orçamento abre o WhatsApp (15) 99683-4734 já com o pedido preenchido.
+Na página de Locação de Material, os botões usam o WhatsApp (15) 99769-7332, número exclusivo dessa página.

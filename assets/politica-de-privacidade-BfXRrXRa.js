@@ -1,0 +1,1 @@
+import{n as e,t}from"./index-CLIPjaNe.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/politica-de-privacidade`})}export{r as component};

@@ -1,0 +1,8 @@
+# Arquivos compactados e redundantes
+*.zip
+dfaria-site-hostgator-v2-corrigido (1)/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini

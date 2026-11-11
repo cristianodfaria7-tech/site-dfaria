@@ -1,0 +1,1 @@
+import{n as e,t}from"./index-CLIPjaNe.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/cardapios/festival-de-massas`})}export{r as component};
