@@ -905,6 +905,144 @@ a {
   color: var(--color-text-muted);
 }
 
+/* Destaque Premium — Nota 5 Google com Estrelas e Brilho */
+.hero-star-glow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hero-star-icon {
+  color: var(--color-gold-light);
+  filter: drop-shadow(0 0 8px rgba(223, 195, 133, 0.75));
+  animation: starPulse 3.2s ease-in-out infinite;
+}
+
+.google-rating-spotlight {
+  position: relative;
+  border-radius: var(--radius-card);
+  padding: 1.75rem 2rem;
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 55%, #164736 100%);
+  border: 1px solid rgba(223, 195, 133, 0.55);
+  color: var(--color-text-light);
+  box-shadow:
+    0 18px 42px rgba(10, 28, 22, 0.22),
+    0 0 36px rgba(185, 154, 88, 0.2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+.google-rating-spotlight::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle at 22% 50%, rgba(223, 195, 133, 0.26), transparent 52%);
+  pointer-events: none;
+}
+
+.google-rating-spotlight::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(105deg, transparent 20%, rgba(255, 244, 214, 0.16) 50%, transparent 80%);
+  animation: spotlightSweep 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.google-rating-left {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 1.35rem;
+  flex-wrap: wrap;
+}
+
+.google-rating-seal {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #f5dfab, var(--color-gold));
+  color: var(--color-surface-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow:
+    0 0 26px rgba(223, 195, 133, 0.65),
+    inset 0 2px 6px rgba(255, 255, 255, 0.6);
+}
+
+.google-rating-seal-num {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.google-rating-seal-star {
+  font-size: 0.72rem;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.google-rating-stars-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--color-gold-light);
+  font-size: 1.2rem;
+  letter-spacing: 0.12em;
+  filter: drop-shadow(0 0 10px rgba(223, 195, 133, 0.75));
+  animation: starPulse 3.2s ease-in-out infinite;
+}
+
+.google-rating-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.35rem, 2.3vw, 1.85rem);
+  font-weight: 500;
+  margin: 0.35rem 0 0;
+  color: var(--color-text-light);
+  line-height: 1.25;
+}
+
+.google-rating-sub {
+  margin: 0.3rem 0 0;
+  font-size: 0.86rem;
+  color: rgba(253, 249, 240, 0.78);
+}
+
+.google-rating-cta {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes spotlightSweep {
+  0%, 45% {
+    left: -120%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+@keyframes starPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(223, 195, 133, 0.65));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(255, 232, 168, 0.95));
+  }
+}
+
 /* ==========================================================================
    ATO IV — CONSOLE DE ATENDIMENTO & CURADORIA PRIVADA (CRM + WHATSAPP)
    ========================================================================== */
@@ -1141,7 +1279,10 @@ a {
 
 /* Acessibilidade: Redução de Movimento */
 @media (prefers-reduced-motion: reduce) {
-  .luxe-hero-img {
+  .luxe-hero-img,
+  .hero-star-icon,
+  .google-rating-stars-row,
+  .google-rating-spotlight::after {
     animation: none !important;
   }
   .reveal-block {
