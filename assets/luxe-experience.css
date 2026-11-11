@@ -1,0 +1,1155 @@
+/* ==========================================================================
+   D'FARIA GASTRONOMIA & EVENTOS — HAUTE GASTRONOMIE & LUXE
+   Design Tokens & Cinematographic Experience Stylesheet
+   ========================================================================== */
+
+:root {
+  /* Identidade & Cores Primárias */
+  --color-primary: #123B2D;         /* Verde Profundo Imperial */
+  --color-primary-dark: #0A1C16;    /* Verde Abissal de Fundo */
+  --color-gold: #B99A58;            /* Dourado Nobre Fosco */
+  --color-gold-light: #DFC385;      /* Champagne Dourado */
+  --color-gold-aura: rgba(185, 154, 88, 0.16);
+
+  /* Superfícies & Tons Luminosos */
+  --color-surface-bg: #FDFBF7;      /* Marfim Acetinado */
+  --color-surface-card: #FFFFFF;    /* Branco Puro */
+  --color-surface-soft: #F5F0E6;    /* Champagne Suave / Linho */
+  --color-surface-dark: #0A0D0B;    /* Preto Carvão Nobre (Hero / Rodapé) */
+
+  /* Textos & Contrastes */
+  --color-text-main: #1C2420;       /* Preto Grafite Suave */
+  --color-text-muted: #5C6761;      /* Chumbo Médio de Leitura */
+  --color-text-light: #FDF9F0;      /* Marfim Claro para Fundos Escuros */
+  --color-text-gold: #CDB06F;       /* Dourado para Itálicos e Ênfases */
+
+  /* Tipografia */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Formas & Raios de Borda (Squircles Autorizados) */
+  --radius-button: 8px;
+  --radius-card: 12px;
+  --radius-pill: 9999px;
+
+  /* Transições de Engenharia */
+  --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-ken-burns: transform 24s ease-in-out infinite alternate;
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-surface-bg);
+  color: var(--color-text-main);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 3rem;
+  }
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.text-gold-accent {
+  color: var(--color-text-gold);
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Preview Ribbon */
+.preview-ribbon {
+  background: var(--color-primary-dark);
+  color: var(--color-text-light);
+  border-bottom: 1px solid rgba(185, 154, 88, 0.35);
+  font-size: 0.78rem;
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 60;
+}
+
+.preview-ribbon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-gold-light);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+
+.preview-ribbon-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  box-shadow: 0 0 10px var(--color-gold);
+}
+
+.preview-ribbon-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.preview-ribbon-link {
+  color: var(--color-gold-light);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: var(--transition-smooth);
+}
+
+.preview-ribbon-link:hover {
+  color: #fff;
+}
+
+/* Header Editorial */
+.luxe-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10, 28, 22, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(185, 154, 88, 0.28);
+  transition: var(--transition-smooth);
+}
+
+.luxe-header.is-scrolled {
+  background: rgba(10, 13, 11, 0.94);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+.luxe-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.75rem 0;
+}
+
+.luxe-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-shrink: 0;
+}
+
+.luxe-brand img {
+  height: 54px;
+  width: auto;
+}
+
+.luxe-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.luxe-brand-name {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  color: var(--color-text-light);
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.luxe-brand-sub {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--color-gold-light);
+  margin-top: 0.15rem;
+}
+
+.luxe-nav {
+  display: none;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1100px) {
+  .luxe-nav {
+    display: flex;
+  }
+}
+
+.luxe-nav a {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: rgba(253, 249, 240, 0.84);
+  letter-spacing: 0.02em;
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+}
+
+.luxe-nav a:hover {
+  color: var(--color-gold-light);
+}
+
+.luxe-header-cta {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .luxe-header-cta {
+    display: inline-flex;
+  }
+}
+
+.luxe-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-button);
+  border: 1px solid rgba(185, 154, 88, 0.4);
+  background: rgba(18, 59, 45, 0.5);
+  color: var(--color-text-light);
+  cursor: pointer;
+}
+
+@media (min-width: 1100px) {
+  .luxe-menu-toggle {
+    display: none;
+  }
+}
+
+/* Mobile Drawer */
+.luxe-mobile-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.luxe-mobile-drawer.is-open {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.luxe-mobile-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 13, 11, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.luxe-mobile-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(340px, 86vw);
+  background: var(--color-primary-dark);
+  border-left: 1px solid rgba(185, 154, 88, 0.3);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxe-mobile-drawer.is-open .luxe-mobile-panel {
+  transform: translateX(0);
+}
+
+.luxe-mobile-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.luxe-mobile-links a {
+  color: var(--color-text-light);
+  font-size: 1.05rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(253, 249, 240, 0.08);
+}
+
+/* ==========================================================================
+   SISTEMA DE BOTÕES CONTEMPORÂNEOS (Custom Squircle)
+   ========================================================================== */
+.btn-primary-concierge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.95rem 1.75rem;
+  border-radius: var(--radius-button);
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  border: 1px solid rgba(185, 154, 88, 0.45);
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 1;
+  transition: var(--transition-smooth);
+}
+
+.btn-primary-concierge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, var(--color-gold), #a68642);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: -1;
+}
+
+.btn-primary-concierge:hover {
+  transform: translateY(-2px);
+  color: var(--color-surface-dark);
+  border-color: var(--color-gold-light);
+  box-shadow: 0 14px 28px rgba(10, 28, 22, 0.25);
+}
+
+.btn-primary-concierge:hover::before {
+  transform: scaleX(1);
+}
+
+.btn-primary-concierge .btn-arrow {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary-concierge:hover .btn-arrow {
+  transform: translateX(6px);
+}
+
+.btn-cinematic-film {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 0.95rem 1.65rem;
+  border-radius: var(--radius-button);
+  background: rgba(223, 195, 133, 0.12);
+  color: var(--color-gold-light);
+  border: 1px solid rgba(223, 195, 133, 0.38);
+  backdrop-filter: blur(10px);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+
+.btn-cinematic-film::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: rotate(25deg);
+  transition: left 0.65s ease;
+}
+
+.btn-cinematic-film:hover {
+  background: rgba(223, 195, 133, 0.22);
+  border-color: var(--color-gold-light);
+  color: #fff;
+  box-shadow: 0 0 28px var(--color-gold-aura);
+  transform: translateY(-2px);
+}
+
+.btn-cinematic-film:hover::after {
+  left: 130%;
+}
+
+/* ==========================================================================
+   HERO COM PARALLAX, KEN BURNS & LENS SWEEP ANAMÓRFICO
+   ========================================================================== */
+.luxe-hero {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-surface-dark);
+  color: var(--color-text-light);
+  overflow: hidden;
+  perspective: 1000px;
+}
+
+.luxe-hero-bg-wrap {
+  position: absolute;
+  inset: -6%;
+  z-index: 0;
+  will-change: transform;
+}
+
+.luxe-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: kenBurns 24s ease-in-out infinite alternate;
+  filter: brightness(0.62) contrast(1.06);
+}
+
+@keyframes kenBurns {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.09) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+.luxe-hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 22% 55%, rgba(10, 28, 22, 0.72) 0%, rgba(10, 13, 11, 0.45) 55%, rgba(10, 13, 11, 0.85) 100%),
+    linear-gradient(180deg, rgba(10, 13, 11, 0.55) 0%, rgba(10, 13, 11, 0.2) 45%, rgba(10, 13, 11, 0.92) 100%);
+}
+
+/* Simulação de Lente Anamórfica (Lens Sweep) reagindo ao cursor */
+.luxe-lens-sweep {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.75;
+  background: radial-gradient(
+    520px circle at var(--lens-x, 50%) var(--lens-y, 40%),
+    rgba(223, 195, 133, 0.22),
+    rgba(185, 154, 88, 0.06) 45%,
+    transparent 72%
+  );
+  transition: opacity 0.3s ease;
+}
+
+.luxe-hero-content {
+  position: relative;
+  z-index: 3;
+  padding: 5rem 0 4.5rem;
+  max-width: 820px;
+}
+
+.luxe-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-gold-light);
+}
+
+.luxe-eyebrow::before {
+  content: '';
+  width: 36px;
+  height: 1px;
+  background: var(--color-gold);
+}
+
+.luxe-hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 5.2vw, 4.4rem);
+  font-weight: 500;
+  line-height: 1.09;
+  letter-spacing: -0.015em;
+  margin: 1.5rem 0 0;
+  color: var(--color-text-light);
+}
+
+.luxe-hero-subtitle {
+  margin: 1.5rem 0 0;
+  max-width: 58ch;
+  font-size: clamp(1rem, 1.3vw, 1.18rem);
+  line-height: 1.7;
+  color: rgba(253, 249, 240, 0.84);
+}
+
+.luxe-hero-actions {
+  margin-top: 2.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.luxe-hero-metrics {
+  margin-top: 3.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(223, 195, 133, 0.22);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1.5rem;
+}
+
+.luxe-metric-val {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  color: var(--color-gold-light);
+  line-height: 1.1;
+}
+
+.luxe-metric-label {
+  font-size: 0.8rem;
+  color: rgba(253, 249, 240, 0.72);
+  margin-top: 0.25rem;
+}
+
+/* ==========================================================================
+   SEÇÕES & REVEAL ANIMATION
+   ========================================================================== */
+.luxe-section {
+  padding: 5.5rem 0;
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .luxe-section {
+    padding: 7.5rem 0;
+  }
+}
+
+.luxe-section-dark {
+  background: var(--color-primary-dark);
+  color: var(--color-text-light);
+}
+
+.luxe-section-soft {
+  background: var(--color-surface-soft);
+}
+
+.luxe-section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.8vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1.14;
+  margin: 1rem 0 0;
+}
+
+.luxe-section-lead {
+  margin: 1.25rem 0 0;
+  max-width: 60ch;
+  color: var(--color-text-muted);
+  font-size: 1.04rem;
+}
+
+.luxe-section-dark .luxe-section-lead {
+  color: rgba(253, 249, 240, 0.78);
+}
+
+.reveal-block {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-block.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   ATO I — O RITUAL ANCESTRAL DO FOGO (PARRILLA & FOGO DE CHÃO)
+   ========================================================================== */
+.act-fire-grid {
+  display: grid;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .act-fire-grid {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 4.5rem;
+  }
+}
+
+.fire-gallery-mosaic {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.fire-card {
+  position: relative;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1px solid rgba(185, 154, 88, 0.25);
+  background: var(--color-surface-dark);
+}
+
+.fire-card.is-tall {
+  grid-row: span 2;
+}
+
+.fire-card img {
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  object-fit: cover;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fire-card:hover img {
+  transform: scale(1.06);
+}
+
+.fire-card-caption {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 2rem 1.15rem 1rem;
+  background: linear-gradient(to top, rgba(10, 13, 11, 0.9), transparent);
+  color: var(--color-text-light);
+  font-size: 0.84rem;
+}
+
+.fire-pillars {
+  margin-top: 2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.fire-pillar-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.15rem 1.35rem;
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(185, 154, 88, 0.22);
+  transition: var(--transition-smooth);
+}
+
+.fire-pillar-item:hover {
+  background: rgba(185, 154, 88, 0.1);
+  border-color: var(--color-gold);
+  transform: translateX(4px);
+}
+
+/* ==========================================================================
+   ATO II — MENU DE DEGUSTAÇÃO EM 5 TEMPOS GASTRONÔMICOS
+   ========================================================================== */
+.tasting-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.tasting-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .tasting-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .tasting-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+.tasting-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-card);
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(28, 36, 32, 0.08);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(18, 59, 45, 0.05);
+  transition: var(--transition-smooth);
+}
+
+.tasting-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(185, 154, 88, 0.55);
+  box-shadow: 0 22px 44px rgba(18, 59, 45, 0.12);
+}
+
+.tasting-img-wrap {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  position: relative;
+}
+
+.tasting-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tasting-card:hover .tasting-img-wrap img {
+  transform: scale(1.07);
+}
+
+.tasting-step-badge {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: rgba(10, 28, 22, 0.88);
+  border: 1px solid rgba(223, 195, 133, 0.45);
+  color: var(--color-gold-light);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tasting-body {
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.tasting-kicker {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
+.tasting-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  margin: 0.35rem 0 0.6rem;
+  color: var(--color-text-main);
+  line-height: 1.25;
+}
+
+.tasting-desc {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  margin: 0 0 1.15rem;
+  flex: 1;
+}
+
+.tasting-link {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tasting-link:hover {
+  color: var(--color-gold);
+}
+
+/* ==========================================================================
+   ATO III — O CHEF & AVALIAÇÕES REAIS NO GOOGLE
+   ========================================================================== */
+.chef-grid {
+  display: grid;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .chef-grid {
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 4.5rem;
+  }
+}
+
+.chef-portrait-frame {
+  position: relative;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1px solid rgba(185, 154, 88, 0.35);
+  box-shadow: 0 24px 48px rgba(10, 28, 22, 0.14);
+}
+
+.chef-portrait-frame img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.reviews-grid {
+  margin-top: 3.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  .reviews-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.review-card {
+  background: var(--color-surface-card);
+  border-radius: var(--radius-card);
+  padding: 1.75rem;
+  border: 1px solid rgba(185, 154, 88, 0.22);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+  box-shadow: 0 8px 24px rgba(18, 59, 45, 0.04);
+}
+
+.review-stars {
+  color: #D49B27;
+  letter-spacing: 0.12em;
+  font-size: 0.95rem;
+}
+
+.review-quote {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--color-text-main);
+  line-height: 1.6;
+}
+
+.review-author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.review-author img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.review-author-name {
+  font-size: 0.86rem;
+  font-weight: 600;
+  display: block;
+}
+
+.review-author-time {
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   ATO IV — CONSOLE DE ATENDIMENTO & CURADORIA PRIVADA (CRM + WHATSAPP)
+   ========================================================================== */
+.concierge-wrapper {
+  background: var(--color-surface-card);
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(185, 154, 88, 0.35);
+  box-shadow: 0 28px 64px rgba(10, 28, 22, 0.12);
+  overflow: hidden;
+  display: grid;
+}
+
+@media (min-width: 1024px) {
+  .concierge-wrapper {
+    grid-template-columns: 0.9fr 1.1fr;
+  }
+}
+
+.concierge-aside {
+  background: linear-gradient(155deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: var(--color-text-light);
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .concierge-aside {
+    padding: 3.25rem;
+  }
+}
+
+.concierge-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  display: grid;
+  gap: 0.9rem;
+  font-size: 0.92rem;
+  color: rgba(253, 249, 240, 0.88);
+}
+
+.concierge-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.concierge-check-icon {
+  color: var(--color-gold-light);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.concierge-form-box {
+  padding: 2.5rem;
+}
+
+@media (min-width: 1024px) {
+  .concierge-form-box {
+    padding: 3.25rem;
+  }
+}
+
+.concierge-format-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.format-pill {
+  padding: 0.5rem 0.95rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(28, 36, 32, 0.18);
+  background: var(--color-surface-bg);
+  color: var(--color-text-main);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.format-pill.is-active,
+.format-pill:hover {
+  background: var(--color-primary);
+  color: var(--color-text-light);
+  border-color: var(--color-gold);
+}
+
+.concierge-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.15rem;
+}
+
+@media (min-width: 640px) {
+  .concierge-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.concierge-field-full {
+  grid-column: 1 / -1;
+}
+
+.concierge-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.concierge-input {
+  width: 100%;
+  padding: 0.78rem 0.95rem;
+  border-radius: var(--radius-button);
+  border: 1px solid rgba(28, 36, 32, 0.18);
+  background: var(--color-surface-bg);
+  color: var(--color-text-main);
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.concierge-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(18, 59, 45, 0.14);
+}
+
+.concierge-status {
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-button);
+  font-size: 0.88rem;
+  display: none;
+}
+
+.concierge-status.is-error {
+  display: block;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.concierge-status.is-success {
+  display: block;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+/* ==========================================================================
+   FOOTER & FLOATING WHATSAPP
+   ========================================================================== */
+.luxe-footer {
+  background: var(--color-surface-dark);
+  color: var(--color-text-light);
+  padding: 4.5rem 0 2.5rem;
+  border-top: 1px solid rgba(185, 154, 88, 0.28);
+}
+
+.luxe-footer-grid {
+  display: grid;
+  gap: 2.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .luxe-footer-grid {
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  }
+}
+
+.luxe-footer h3 {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-gold-light);
+  margin: 0 0 1rem;
+}
+
+.luxe-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: rgba(253, 249, 240, 0.72);
+}
+
+.luxe-footer ul a:hover {
+  color: var(--color-gold-light);
+}
+
+.luxe-footer-bottom {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(253, 249, 240, 0.12);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: rgba(253, 249, 240, 0.55);
+}
+
+.whatsapp-float-luxe {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 55;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #25D366;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+  transition: transform 0.3s ease;
+}
+
+.whatsapp-float-luxe:hover {
+  transform: scale(1.08);
+}
+
+/* Acessibilidade: Redução de Movimento */
+@media (prefers-reduced-motion: reduce) {
+  .luxe-hero-img {
+    animation: none !important;
+  }
+  .reveal-block {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .luxe-lens-sweep {
+    display: none;
+  }
+}
