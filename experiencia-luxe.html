@@ -8,7 +8,7 @@
   <meta name="robots" content="noindex, nofollow" />
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
   <link rel="canonical" href="https://dfariagastronomia.com.br/experiencia-luxe" />
-  <link rel="preload" as="image" href="/__l5e/assets-v1/1472106d-603b-4c1a-9f89-7b8fdf1f18ef/hero-mesa-piscina.webp" />
+  <link rel="preload" as="image" href="/__l5e/assets-v1/36f147ee-564d-410e-9e6f-d1ec26c3f782/mesa-posta-toalha-verde-dfaria.webp" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
@@ -97,20 +97,22 @@
 
   <main id="conteudo">
     <!-- ================================================================
-         HERO EDITORIAL SPLIT — FOTOGRAFIA REAL 100% CRISTALINA (ZERO VÉU)
+         HERO EDITORIAL + CARROSSEL PANORÂMICO GRANDE (100% LARGURA · ZERO VÉU)
          ================================================================ -->
     <section class="luxe-hero" id="hero-section">
       <div class="container">
-        <div class="luxe-hero-split">
-          <div class="luxe-hero-content">
+        <div class="luxe-hero-intro">
+          <div>
             <p class="luxe-eyebrow">Desde 2016 · Cesário Lange e Região</p>
             <h1 class="luxe-hero-title">
               Eu assumo cada detalhe. <em class="text-gold-accent">Você vive o esplendor</em> do seu evento.
             </h1>
+          </div>
+
+          <div class="luxe-hero-right">
             <p class="luxe-hero-subtitle">
               Onde o rigor da alta hospitalidade encontra a alma do fogo ancestral, ilhas autorais e esculturas exclusivas — conduzidos pelos mais de 38 anos de trajetória do Chef Cristiano De Faria.
             </p>
-
             <div class="luxe-hero-actions">
               <a href="#curadoria" class="btn-primary-concierge">
                 <span>Solicitar Proposta Sob Medida</span>
@@ -121,70 +123,89 @@
                 <span aria-hidden="true">↓</span>
               </a>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <div class="luxe-hero-metrics">
-              <div>
-                <div class="luxe-metric-val">+38 Anos</div>
-                <div class="luxe-metric-label">Trajetória culinária do Chef Cristiano De Faria</div>
-              </div>
-              <div>
-                <div class="luxe-metric-val hero-star-glow">
-                  <span class="hero-star-icon" aria-hidden="true">★</span>
-                  <span>Nota 5</span>
-                </div>
-                <div class="luxe-metric-label">Com todas as avaliações positivas no Google</div>
-              </div>
-              <div>
-                <div class="luxe-metric-val">17 Menus</div>
-                <div class="luxe-metric-label">Cardápios personalizados do coquetel ao jantar</div>
-              </div>
-              <div>
-                <div class="luxe-metric-val">CRM Direto</div>
-                <div class="luxe-metric-label">Atendimento ágil via WhatsApp e gestão integrada</div>
-              </div>
-            </div>
+      <!-- Carrossel de Largura Total — ZERO véu, ZERO texto em cima das fotos -->
+      <div class="luxe-carousel-stage" id="hero-showcase">
+        <img
+          src="/__l5e/assets-v1/36f147ee-564d-410e-9e6f-d1ec26c3f782/mesa-posta-toalha-verde-dfaria.webp"
+          alt="Mesa posta com toalha verde, cadeiras douradas e taças de cristal à beira da piscina pelo D'Faria Gastronomia"
+          class="luxe-showcase-slide is-active"
+          width="1400"
+          height="1050"
+          fetchpriority="high"
+        />
+        <img
+          src="/__l5e/assets-v1/459e8554-24ce-4397-b95e-e3c6e7fa59fc/ilha-de-frios-evento-noturno-dfaria.webp"
+          alt="Favo de mel natural sobre queijo brie, frutas frescas e iluminação noturna na ilha de frios do D'Faria"
+          class="luxe-showcase-slide"
+          width="1400"
+          height="1050"
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          src="/__l5e/assets-v1/b49f2133-c5eb-4d37-90fa-89a9304eaf98/fogo-chao-parrilla.webp"
+          alt="Estação de fogo de chão e parrilla ao vivo do D'Faria Gastronomia"
+          class="luxe-showcase-slide"
+          width="1280"
+          height="960"
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          src="/__l5e/assets-v1/79439b84-da56-495f-9a75-81311d234e2c/mesa-posta-beira-piscina-dfaria.webp"
+          alt="Recepção ao ar livre com palmeiras e mesas montadas à beira da piscina pelo D'Faria"
+          class="luxe-showcase-slide"
+          width="1400"
+          height="1050"
+          loading="lazy"
+          decoding="async"
+        />
+
+        <button type="button" class="luxe-carousel-arrow luxe-carousel-prev" id="carousel-prev" aria-label="Foto anterior">‹</button>
+        <button type="button" class="luxe-carousel-arrow luxe-carousel-next" id="carousel-next" aria-label="Próxima foto">›</button>
+      </div>
+
+      <!-- Barra de Controles & Métricas abaixo do Carrossel -->
+      <div class="luxe-hero-bar">
+        <div class="container">
+          <div class="luxe-showcase-controls" role="tablist" aria-label="Cenas reais do D'Faria">
+            <button type="button" class="luxe-showcase-tab is-active" data-slide="0" role="tab" aria-selected="true">
+              01 · Mesa Posta &amp; Recepção
+            </button>
+            <button type="button" class="luxe-showcase-tab" data-slide="1" role="tab" aria-selected="false">
+              02 · Ilha de Frios &amp; Favo de Mel
+            </button>
+            <button type="button" class="luxe-showcase-tab" data-slide="2" role="tab" aria-selected="false">
+              03 · Fogo de Chão &amp; Parrilla
+            </button>
+            <button type="button" class="luxe-showcase-tab" data-slide="3" role="tab" aria-selected="false">
+              04 · Eventos ao Ar Livre
+            </button>
           </div>
 
-          <div class="luxe-showcase-column">
-            <div class="luxe-showcase-frame" id="hero-showcase">
-              <img
-                src="/__l5e/assets-v1/1472106d-603b-4c1a-9f89-7b8fdf1f18ef/hero-mesa-piscina.webp"
-                alt="Mesa posta à beira da piscina com flores e taças em evento real do D'Faria Gastronomia"
-                class="luxe-showcase-slide is-active"
-                width="1280"
-                height="960"
-                fetchpriority="high"
-              />
-              <img
-                src="/__l5e/assets-v1/84312213-e170-4fa3-8762-0c71b543759f/ilha-frios-hero.webp"
-                alt="Ilha de frios e antepastos preparada pelo D'Faria Gastronomia"
-                class="luxe-showcase-slide"
-                width="1280"
-                height="960"
-                loading="lazy"
-                decoding="async"
-              />
-              <img
-                src="/__l5e/assets-v1/b49f2133-c5eb-4d37-90fa-89a9304eaf98/fogo-chao-parrilla.webp"
-                alt="Estação de fogo de chão e parrilla ao vivo do D'Faria Gastronomia"
-                class="luxe-showcase-slide"
-                width="1280"
-                height="960"
-                loading="lazy"
-                decoding="async"
-              />
+          <div class="luxe-hero-metrics">
+            <div>
+              <div class="luxe-metric-val">+38 Anos</div>
+              <div class="luxe-metric-label">Trajetória culinária do Chef Cristiano De Faria</div>
             </div>
-
-            <div class="luxe-showcase-controls" role="tablist" aria-label="Cenas reais do D'Faria">
-              <button type="button" class="luxe-showcase-tab is-active" data-slide="0" role="tab" aria-selected="true">
-                01 · Mesa Posta &amp; Recepção
-              </button>
-              <button type="button" class="luxe-showcase-tab" data-slide="1" role="tab" aria-selected="false">
-                02 · Ilhas de Frios Autorais
-              </button>
-              <button type="button" class="luxe-showcase-tab" data-slide="2" role="tab" aria-selected="false">
-                03 · Fogo de Chão &amp; Parrilla
-              </button>
+            <div>
+              <div class="luxe-metric-val hero-star-glow">
+                <span class="hero-star-icon" aria-hidden="true">★</span>
+                <span>Nota 5</span>
+              </div>
+              <div class="luxe-metric-label">Com todas as avaliações positivas no Google</div>
+            </div>
+            <div>
+              <div class="luxe-metric-val">17 Menus</div>
+              <div class="luxe-metric-label">Cardápios personalizados do coquetel ao jantar</div>
+            </div>
+            <div>
+              <div class="luxe-metric-val">CRM Direto</div>
+              <div class="luxe-metric-label">Atendimento ágil via WhatsApp e gestão integrada</div>
             </div>
           </div>
         </div>
@@ -687,6 +708,9 @@
         }, 5500);
       }
 
+      const prevBtn = document.getElementById('carousel-prev');
+      const nextBtn = document.getElementById('carousel-next');
+
       tabs.forEach(function (tab) {
         tab.addEventListener('click', function () {
           const idx = Number(tab.getAttribute('data-slide') || 0);
@@ -694,6 +718,18 @@
           startAutoPlay();
         });
       });
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+          showSlide(currentSlide - 1);
+          startAutoPlay();
+        });
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+          showSlide(currentSlide + 1);
+          startAutoPlay();
+        });
+      }
       startAutoPlay();
 
       // 3. Reveal das seções via IntersectionObserver
