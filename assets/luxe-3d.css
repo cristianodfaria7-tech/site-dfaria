@@ -1,7 +1,7 @@
 /* ==========================================================================
-   D'FARIA GASTRONOMIA & EVENTOS — EXPERIÊNCIA 3D / HAUTE GASTRONOMIE
-   Inspirado na mecânica imersiva de câmera 3D / scroll pinning (estilo Oryzo)
-   100% Fotos Reais do D'Faria · Zero Véu · Zero Artificialidade de IA
+   D'FARIA GASTRONOMIA & EVENTOS — EXPERIÊNCIA CINEMATOGRÁFICA EM VÍDEO REAL
+   100% Vídeo e Fotos Reais do D'Faria · Zero Véu · Zero Artificialidade de IA
+   Superprodução Cinema · Atmosfera Dinâmica Refinada & Parallax
    ========================================================================== */
 
 :root {
@@ -9,7 +9,7 @@
   --color-primary-dark: #0A1C16;    /* Verde Abissal de Fundo */
   --color-gold: #B99A58;           /* Dourado Nobre Fosco */
   --color-gold-light: #DFC385;     /* Champagne Dourado */
-  --color-gold-aura: rgba(185, 154, 88, 0.18);
+  --color-gold-aura: rgba(185, 154, 88, 0.22);
   --color-surface-bg: #FDFBF7;      /* Marfim Acetinado */
   --color-surface-card: #FFFFFF;    /* Branco Puro */
   --color-surface-soft: #F5F0E6;    /* Champagne Suave / Linho */
@@ -44,9 +44,8 @@ body {
   background-color: var(--color-surface-bg);
 }
 
-img {
+img, video {
   max-width: 100%;
-  height: auto;
   display: block;
 }
 
@@ -219,12 +218,12 @@ a {
   background: var(--color-primary);
   color: var(--color-text-light);
   border: 1px solid rgba(185, 154, 88, 0.5);
-  padding: 0.75rem 1.6rem;
+  padding: 0.8rem 1.65rem;
   border-radius: var(--radius-btn);
   font-size: 0.88rem;
   font-weight: 600;
   letter-spacing: 0.03em;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(223, 195, 133, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(223, 195, 133, 0.25);
   transition: var(--transition);
   cursor: pointer;
   white-space: nowrap;
@@ -233,7 +232,7 @@ a {
   background: #174b39;
   border-color: var(--color-gold-light);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(18, 59, 45, 0.4), 0 0 16px var(--color-gold-aura);
+  box-shadow: 0 8px 24px rgba(18, 59, 45, 0.5), 0 0 20px var(--color-gold-aura);
 }
 .btn-primary-concierge .btn-arrow {
   transition: transform 0.3s ease;
@@ -247,12 +246,12 @@ a {
   align-items: center;
   justify-content: center;
   gap: 0.65rem;
-  background: rgba(253, 249, 240, 0.08);
+  background: rgba(10, 28, 22, 0.65);
   color: var(--color-text-light);
   border: 1px solid rgba(223, 195, 133, 0.45);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 0.75rem 1.5rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0.8rem 1.55rem;
   border-radius: var(--radius-btn);
   font-size: 0.88rem;
   font-weight: 600;
@@ -261,11 +260,11 @@ a {
   cursor: pointer;
 }
 .btn-cinematic-film:hover {
-  background: rgba(223, 195, 133, 0.2);
+  background: rgba(223, 195, 133, 0.25);
   border-color: var(--color-gold-light);
   color: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .luxe-menu-toggle {
@@ -284,275 +283,223 @@ a {
 }
 
 /* ==========================================================================
-   ESTRUTURA 3D DE SCROLL PINNING (ESTILO ORYZO)
-   A viewport fica sticky enquanto o container rola por 240vh.
-   A imagem fotográfica real sofre escala, pan e tilt 3D limpo, sem véu.
+   HERO CINEMATOGRÁFICA EM VÍDEO REAL 100% LUMINOSA & NÍTIDA
    ========================================================================== */
-.stage-pin-wrapper {
+.cinema-hero {
   position: relative;
-  height: 240vh; /* Altura do scroll para interpolar a câmera 3D */
-  background: #060907;
-}
-
-.stage-viewport {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   overflow: hidden;
-  perspective: 1200px;
-  perspective-origin: 50% 50%;
+  background: #000;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #060907;
+  align-items: flex-end;
+  padding: 8rem 0 3.5rem;
 }
 
-/* O plano da câmera que contém a foto real */
-.camera-plane {
-  position: absolute;
-  inset: -5% -5% -5% -5%; /* Leve sobra para cobrir a rotação sem bordas pretas */
-  width: 110%;
-  height: 110%;
-  transform-style: preserve-3d;
-  will-change: transform;
-  transform: translate3d(0, 0, 0) scale(1) rotateX(0deg) rotateY(0deg);
-  transition: transform 0.08s ease-out;
-}
-
-/* Foto real nítida: ZERO véu cobrindo o centro ou desbotando a imagem */
-.camera-plane img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 42%;
-  display: block;
-}
-
-/* Seletor rápido de fotos reais no canto inferior da viewport */
-.scene-switcher {
-  position: absolute;
-  bottom: 2rem;
-  left: 2rem;
-  z-index: 40;
-  display: flex;
-  gap: 0.5rem;
-  pointer-events: auto;
-}
-.scene-chip {
-  background: rgba(10, 28, 22, 0.75);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(185, 154, 88, 0.35);
-  color: var(--color-text-light);
-  font-size: 0.74rem;
-  font-weight: 600;
-  padding: 0.45rem 0.85rem;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: var(--transition);
-}
-.scene-chip:hover, .scene-chip.is-active {
-  background: var(--color-primary);
-  border-color: var(--color-gold-light);
-  color: var(--color-gold-light);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
-/* ==========================================================================
-   HUD FLOATING OVERLAY (ESTILO ORYZO)
-   O container não bloqueia o mouse (`pointer-events: none`).
-   Os cartões e botões têm `pointer-events: auto`.
-   ========================================================================== */
-.stage-hud {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 30;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 7rem 2rem 2.5rem;
-  will-change: opacity, transform;
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-}
-
-@media (min-width: 768px) {
-  .stage-hud {
-    padding: 7.5rem 3.5rem 3rem;
+@media (min-width: 1024px) {
+  .cinema-hero {
+    min-height: 100vh;
+    padding: 9rem 0 4.5rem;
   }
 }
 
-/* Bloco superior com a tipografia monumental */
-.hud-top {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  max-width: 900px;
+/* Container de Background do Vídeo */
+.cinema-video-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
 }
 
-.hud-eyebrow {
+.cinema-video-stage video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.02);
+  transition: transform 12s ease-out;
+}
+
+/* Fallback de imagem real caso o navegador demore a carregar o vídeo */
+.cinema-video-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  transition: opacity 0.8s ease-out;
+}
+.cinema-video-poster.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Apenas vinheta periférica suave para contraste de texto (NUNCA VÉU CINZA/ESCURO) */
+.cinema-ambient-lighting {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(10, 28, 22, 0.75) 0%, transparent 22%),
+    linear-gradient(0deg, rgba(10, 28, 22, 0.92) 0%, rgba(10, 28, 22, 0.45) 28%, transparent 65%);
+}
+
+/* Conteúdo Editorial da Hero */
+.cinema-hero-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+.cinema-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  background: rgba(10, 28, 22, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(185, 154, 88, 0.4);
-  padding: 0.35rem 0.85rem;
+  gap: 0.6rem;
+  background: rgba(10, 28, 22, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(185, 154, 88, 0.45);
+  padding: 0.4rem 0.95rem;
   border-radius: 9999px;
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-gold-light);
-  margin-bottom: 1.25rem;
-  pointer-events: auto;
+  margin-bottom: 1.5rem;
 }
 
-.hud-headline {
+.cinema-headline {
   font-family: var(--font-serif);
-  font-size: clamp(2.2rem, 5.2vw, 4.4rem);
+  font-size: clamp(2.3rem, 5.6vw, 4.6rem);
   font-weight: 700;
   line-height: 1.08;
   color: #FFFFFF;
-  margin: 0 0 1rem;
+  margin: 0 0 1.25rem;
   letter-spacing: -0.01em;
-  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.65), 0 1px 3px rgba(0, 0, 0, 0.9);
+  max-width: 18ch;
+  text-shadow: 0 3px 20px rgba(0, 0, 0, 0.8), 0 1px 3px rgba(0, 0, 0, 0.95);
 }
 
-.hud-headline em {
+.cinema-headline em {
   font-style: italic;
   font-weight: 400;
   color: var(--color-gold-light);
-  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 3px 22px rgba(0, 0, 0, 0.85);
 }
 
-.hud-lead {
-  font-size: clamp(0.95rem, 1.35vw, 1.15rem);
-  line-height: 1.55;
+.cinema-lead {
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  line-height: 1.6;
   color: rgba(253, 249, 240, 0.95);
-  max-width: 620px;
-  margin: 0 0 1.75rem;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  max-width: 62ch;
+  margin: 0 0 2rem;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
 }
 
-.hud-actions {
+.cinema-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.25rem;
   align-items: center;
-  pointer-events: auto;
 }
 
-/* Indicador de rolagem e aproximação 3D (estilo Oryzo) */
-.hud-scroll-cue {
+/* Selo iluminado Nota 5 Google */
+.cinema-google-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  color: var(--color-gold-light);
-  font-size: 0.74rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  background: rgba(10, 28, 22, 0.65);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(185, 154, 88, 0.3);
-  border-radius: 9999px;
-  pointer-events: auto;
-}
-.scroll-mouse-icon {
-  width: 14px;
-  height: 22px;
-  border: 1.5px solid var(--color-gold-light);
-  border-radius: 10px;
-  position: relative;
-}
-.scroll-mouse-icon::after {
-  content: '';
-  position: absolute;
-  top: 4px;
-  left: 50%;
-  width: 2px;
-  height: 4px;
-  background: var(--color-gold-light);
-  border-radius: 2px;
-  transform: translateX(-50%);
-  animation: mouse-wheel 1.6s infinite ease-in-out;
-}
-@keyframes mouse-wheel {
-  0% { opacity: 1; transform: translate(-50%, 0); }
-  100% { opacity: 0; transform: translate(-50%, 8px); }
-}
-
-/* Cartões flutuantes laterais com metadados (estilo Oryzo) */
-.hud-meta-card {
-  position: absolute;
-  right: 2rem;
-  top: 35%;
-  max-width: 320px;
-  background: rgba(10, 28, 22, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(185, 154, 88, 0.35);
-  border-radius: var(--radius-card);
-  padding: 1.25rem 1.4rem;
-  color: var(--color-text-light);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-  pointer-events: auto;
-  display: none;
-}
-@media (min-width: 1024px) {
-  .hud-meta-card { display: block; }
-}
-
-.hud-meta-label {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--color-gold-light);
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-}
-.hud-meta-title {
-  font-family: var(--font-serif);
-  font-size: 1.2rem;
-  line-height: 1.25;
-  margin: 0 0 0.5rem;
-  color: #fff;
-}
-.hud-meta-desc {
-  font-size: 0.82rem;
-  line-height: 1.45;
-  color: rgba(253, 249, 240, 0.85);
-  margin: 0;
-}
-
-/* Destaque Estrelado do Google: "Nota 5 com todas as avaliações positivas no Google" */
-.google-star-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  background: rgba(185, 154, 88, 0.22);
+  gap: 0.65rem;
+  background: rgba(10, 28, 22, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--color-gold-light);
-  box-shadow: 0 0 16px rgba(223, 195, 133, 0.35);
-  padding: 0.45rem 0.95rem;
+  box-shadow: 0 0 24px rgba(223, 195, 133, 0.35);
+  padding: 0.55rem 1.15rem;
   border-radius: 9999px;
   color: #FFFFFF;
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
-.google-star-pill .star-gold {
+.cinema-google-badge .star-gold {
   color: #FFD700;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
-  font-size: 0.95rem;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.9);
+  font-size: 1rem;
+}
+
+/* Controles de Som & Reprodução do Vídeo */
+.cinema-video-controls {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.btn-video-control {
+  background: rgba(10, 28, 22, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(185, 154, 88, 0.4);
+  color: var(--color-text-light);
+  border-radius: 9999px;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-video-control:hover {
+  background: var(--color-primary);
+  border-color: var(--color-gold-light);
+  color: var(--color-gold-light);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* Barra de Destaques logo abaixo da Hero */
+.cinema-highlights-bar {
+  background: #0A1C16;
+  border-top: 1px solid rgba(185, 154, 88, 0.25);
+  border-bottom: 1px solid rgba(185, 154, 88, 0.25);
+  padding: 2.25rem 0;
+  color: var(--color-text-light);
+}
+.cinema-highlights-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+@media (min-width: 640px) {
+  .cinema-highlights-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .cinema-highlights-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.cinema-highlight-val {
+  font-family: var(--font-serif);
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--color-gold-light);
+  line-height: 1.1;
+  margin-bottom: 0.35rem;
+}
+.cinema-highlight-label {
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: rgba(253, 249, 240, 0.82);
 }
 
 /* ==========================================================================
-   SEÇÕES EDITORIALES COMPLEMENTARES (PÓS-STAGE 3D)
+   SEÇÕES EDITORIALES (FOGO, ILHAS, CHEF, CONCIERGE CRM)
    ========================================================================== */
 .luxe-section {
   padding: 6.5rem 0;
