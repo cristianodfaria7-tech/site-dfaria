@@ -1,0 +1,164 @@
+/*
+ * D'Faria Gastronomia — Tokens de Identidade Visual
+ * Apenas fontes + variáveis + seção de regiões atendidas
+ * NÃO altera layout, header, footer ou estrutura de nenhuma página
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+/* ── Variáveis de identidade visual D'Faria ── */
+:root {
+  --df-gold: #B99A58;
+  --df-gold-light: #DFC385;
+  --df-gold-aura: rgba(185, 154, 88, 0.18);
+  --df-green: #123B2D;
+  --df-green-dark: #0A1C16;
+  --df-ivory: #FDFBF7;
+  --df-linen: #F5F0E6;
+  --df-text: #1C2420;
+  --df-muted: #5C6761;
+  --df-serif: 'Playfair Display', Georgia, serif;
+  --df-sans: 'Plus Jakarta Sans', 'Outfit', -apple-system, sans-serif;
+  --df-radius: 10px;
+  --df-transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Seção: Regiões e Cidades Atendidas ── */
+#regioes-atendidas {
+  background: var(--df-green);
+  color: var(--df-ivory);
+  padding: 4rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+#regioes-atendidas::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 20%, rgba(185,154,88,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 50% at 90% 80%, rgba(185,154,88,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+#regioes-atendidas .df-regioes-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  position: relative;
+}
+
+#regioes-atendidas .df-regioes-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--df-gold-light);
+  margin-bottom: 1rem;
+}
+
+#regioes-atendidas .df-regioes-label::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--df-gold);
+}
+
+#regioes-atendidas .df-regioes-titulo {
+  font-family: var(--df-serif);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 600;
+  line-height: 1.2;
+  color: #fff;
+  margin: 0 0 0.5rem;
+}
+
+#regioes-atendidas .df-regioes-sub {
+  font-size: 0.95rem;
+  color: rgba(253,251,247,0.72);
+  margin: 0 0 2.5rem;
+  max-width: 580px;
+}
+
+#regioes-atendidas .df-regioes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+
+#regioes-atendidas .df-regiao-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(185,154,88,0.22);
+  border-radius: 8px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: rgba(253,251,247,0.9);
+  transition: var(--df-transition);
+  text-decoration: none;
+}
+
+#regioes-atendidas .df-regiao-pill:hover {
+  background: rgba(185,154,88,0.15);
+  border-color: rgba(185,154,88,0.5);
+  color: var(--df-gold-light);
+  transform: translateY(-1px);
+}
+
+#regioes-atendidas .df-regiao-pill-icon {
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+#regioes-atendidas .df-regioes-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 2rem;
+  background: var(--df-gold);
+  color: var(--df-green-dark);
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: var(--df-transition);
+  letter-spacing: 0.03em;
+}
+
+#regioes-atendidas .df-regioes-cta:hover {
+  background: var(--df-gold-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(185,154,88,0.4);
+}
+
+/* ── WhatsApp flutuante (apenas se não houver outro no layout) ── */
+.df-whatsapp-float:not([data-exists]) {
+  position: fixed;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  z-index: 999;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25D366;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(37,211,102,0.4);
+  transition: var(--df-transition);
+  text-decoration: none;
+}
+
+.df-whatsapp-float:hover {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 10px 28px rgba(37,211,102,0.55);
+}
