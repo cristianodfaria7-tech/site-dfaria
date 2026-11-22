@@ -3084,7 +3084,7 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
   async function sincronizarPagina() {
     const rawPath = window.location.pathname.replace(/\/$/, '') || '/';
     const pageId = routeMap[rawPath] || routeMap[window.location.pathname];
-    if (!pageId || pageId === 'home') return; // HOME IS STATIC CINEMATIC FASANO - NEVER OVERWRITE
+    if (!pageId || pageId === 'home' || rawPath === '/' || rawPath === '/index.html') return;
 
     try {
       let pageData = null;

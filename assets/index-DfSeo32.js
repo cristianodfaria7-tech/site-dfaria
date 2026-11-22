@@ -3084,7 +3084,7 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
   async function sincronizarPagina() {
     const rawPath = window.location.pathname.replace(/\/$/, '') || '/';
     const pageId = routeMap[rawPath] || routeMap[window.location.pathname];
-    if (!pageId) return;
+    if (!pageId || pageId === 'home' || rawPath === '/' || rawPath === '/index.html') return;
 
     try {
       let pageData = null;
@@ -3134,7 +3134,7 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
       if (pageData.hero) {
         // H1 com higienização de digitação
         if (pageData.hero.titulo) {
-          let titLimpo = pageData.hero.titulo.replace(/CHEFFE/gi, 'CHEF').trim();
+          let titLimpo = pageData.hero.titulo.replace(/CHEFFE/gi, 'CHEF').replace(/CHEF\s+CRISTIANO/gi, 'CHEF CRISTIANO').trim();
           const h1 = document.querySelector('h1');
           if (h1 && h1.textContent.trim() !== titLimpo) {
             h1.textContent = titLimpo;

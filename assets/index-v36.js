@@ -3084,10 +3084,7 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
   async function sincronizarPagina() {
     const rawPath = window.location.pathname.replace(/\/$/, '') || '/';
     const pageId = routeMap[rawPath] || routeMap[window.location.pathname];
-    if (!pageId || pageId === 'home') return; // HOME IS STATIC CINEMATIC FASANO - NEVER OVERWRITE
-    const rawPath = window.location.pathname.replace(/\/$/, '') || '/';
-    const pageId = routeMap[rawPath] || routeMap[window.location.pathname];
-    if (!pageId) return;
+    if (!pageId || pageId === 'home' || rawPath === '/' || rawPath === '/index.html') return;
 
     try {
       let pageData = null;
@@ -3137,7 +3134,7 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
       if (pageData.hero) {
         // H1 com higienização de digitação
         if (pageData.hero.titulo) {
-          let titLimpo = pageData.hero.titulo.replace(/CHEF/gi, 'CHEF').trim();
+          let titLimpo = pageData.hero.titulo.replace(/CHEFFE/gi, 'CHEF').replace(/CHEF\s+CRISTIANO/gi, 'CHEF CRISTIANO').trim();
           const h1 = document.querySelector('h1');
           if (h1 && h1.textContent.trim() !== titLimpo) {
             h1.textContent = titLimpo;
@@ -3146,7 +3143,7 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
 
         // Subtítulo com higienização de digitação
         if (pageData.hero.subtitulo) {
-          let subLimpo = pageData.hero.subtitulo.replace(/VOCÊ/gi, 'VOCÊ').trim();
+          let subLimpo = pageData.hero.subtitulo.replace(/VOCÊVOCÊ/gi, 'VOCÊ').trim();
           const sub = document.querySelector('.df-hero-subtitle, h1 + p, main p, .df-hero-sub');
           if (sub && sub.textContent.trim() !== subLimpo) {
             sub.textContent = subLimpo;
