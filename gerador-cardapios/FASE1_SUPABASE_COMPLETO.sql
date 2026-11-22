@@ -1,0 +1,710 @@
+-- ==============================================================================
+-- FASE 1: PAINEL DO CHEF - SCHEMA DO SITE OFICIAL (DFARIAGASTRONOMIA.COM.BR)
+-- Tabelas dedicadas com prefixo `site_` para isolamento total e segurança máxima
+-- ==============================================================================
+
+-- 1. Categorias dos Cardápios do Site
+CREATE TABLE IF NOT EXISTS public.site_categories (
+    id TEXT PRIMARY KEY,
+    titulo TEXT NOT NULL,
+    ordem INTEGER NOT NULL DEFAULT 0,
+    ativo BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 2. Cardápios Oficiais do Site
+CREATE TABLE IF NOT EXISTS public.site_menus (
+    slug TEXT PRIMARY KEY, -- O slug é permanente e imutável após publicado
+    nome TEXT NOT NULL,
+    categoria_id TEXT NOT NULL REFERENCES public.site_categories(id) ON DELETE RESTRICT,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    sobretitulo TEXT,
+    resumo TEXT NOT NULL,
+    foto_capa JSONB NOT NULL DEFAULT '{}'::jsonb, -- { src, alt, largura, altura }
+    cartao JSONB NOT NULL DEFAULT '{}'::jsonb,
+    secoes JSONB NOT NULL DEFAULT '[]'::jsonb, -- [ { titulo, itens: [...] } ]
+    outros TEXT[] DEFAULT '{}', -- slugs de cardápios relacionados
+    status TEXT NOT NULL DEFAULT 'publicado', -- 'rascunho', 'publicado', 'arquivado'
+    ordem INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 3. Configurações Globais do Catálogo do Site
+CREATE TABLE IF NOT EXISTS public.site_catalog_config (
+    id TEXT PRIMARY KEY DEFAULT 'primary',
+    negocio JSONB NOT NULL DEFAULT '{}'::jsonb, -- Schema.org FoodEstablishment / CateringBusiness
+    lista_cabecalho JSONB NOT NULL DEFAULT '{}'::jsonb, -- title, description, chamada, introducao, imagem
+    fechamento JSONB NOT NULL DEFAULT '{}'::jsonb, -- links de rodapé
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 4. Motor de Preços & Dados Confidenciais (Acesso Restrito ao Dono)
+CREATE TABLE IF NOT EXISTS public.site_pricing_config (
+    id TEXT PRIMARY KEY DEFAULT 'primary',
+    fracao_compras NUMERIC(5, 4) NOT NULL DEFAULT 0.3250, -- c = 32.5%
+    frete_medio NUMERIC(10, 2) NOT NULL DEFAULT 1200.00,
+    piso_margem NUMERIC(5, 4) NOT NULL DEFAULT 0.3000, -- 30%
+    inclinacao_volume NUMERIC(8, 6) NOT NULL DEFAULT 0.000774,
+    equipe_regras JSONB NOT NULL DEFAULT '{
+        "cozinheiro": { "custo": 350.00, "por_convidados": 200 },
+        "maitre": { "custo": 350.00, "por_convidados": 100 },
+        "garcom": { "custo": 200.00, "por_convidados": 25 },
+        "ajudante": { "custo": 200.00, "por_convidados": 50 },
+        "churrasqueiro": { "custo": 350.00, "por_convidados": 100 }
+    }'::jsonb,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 5. Histórico e Auditoria de Alterações (Audit Log)
+CREATE TABLE IF NOT EXISTS public.site_audit_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    autor TEXT NOT NULL, -- 'Cristiano' ou 'Claude'
+    acao TEXT NOT NULL, -- 'criar_cardapio', 'editar_cardapio', 'publicar'
+    alvo_slug TEXT,
+    dados_anteriores JSONB,
+    dados_novos JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- ==============================================================================
+-- SEGURANÇA & PERMISSÕES (Row Level Security - RLS)
+-- ==============================================================================
+
+ALTER TABLE public.site_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.site_menus ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.site_catalog_config ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.site_pricing_config ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.site_audit_logs ENABLE ROW LEVEL SECURITY;
+
+-- Leitura pública para cardápios e categorias publicados e configurações do site
+CREATE POLICY "Leitura pública site_categories" ON public.site_categories
+    FOR SELECT USING (true);
+
+CREATE POLICY "Leitura pública site_menus" ON public.site_menus
+    FOR SELECT USING (status = 'publicado');
+
+CREATE POLICY "Leitura pública site_catalog_config" ON public.site_catalog_config
+    FOR SELECT USING (true);
+
+-- Autenticados (Chef Cristiano e Painel do Chef) têm controle total
+CREATE POLICY "Controle total autenticado site_categories" ON public.site_categories
+    FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+CREATE POLICY "Controle total autenticado site_menus" ON public.site_menus
+    FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+CREATE POLICY "Controle total autenticado site_catalog_config" ON public.site_catalog_config
+    FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+CREATE POLICY "Controle total autenticado site_pricing_config" ON public.site_pricing_config
+    FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+CREATE POLICY "Controle total autenticado site_audit_logs" ON public.site_audit_logs
+    FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+-- Garantir acesso aos schemas
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT SELECT ON public.site_categories, public.site_menus, public.site_catalog_config TO anon;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
+-- ==============================================================================
+-- SEED DE DADOS FASE 1: 17 CARDÁPIOS OFICIAIS DO SITE DFARIAGASTRONOMIA.COM.BR
+-- ==============================================================================
+
+-- 1. CATEGORIAS
+INSERT INTO public.site_categories (id, titulo, ordem, ativo)
+VALUES ('almocos-e-jantares', 'Almoços e Jantares', 1, true)
+ON CONFLICT (id) DO UPDATE SET titulo = EXCLUDED.titulo, ordem = EXCLUDED.ordem;
+INSERT INTO public.site_categories (id, titulo, ordem, ativo)
+VALUES ('experiencias-gastronomicas', 'Experiências Gastronômicas', 2, true)
+ON CONFLICT (id) DO UPDATE SET titulo = EXCLUDED.titulo, ordem = EXCLUDED.ordem;
+INSERT INTO public.site_categories (id, titulo, ordem, ativo)
+VALUES ('cafes-e-brunches', 'Cafés e Brunches', 3, true)
+ON CONFLICT (id) DO UPDATE SET titulo = EXCLUDED.titulo, ordem = EXCLUDED.ordem;
+INSERT INTO public.site_categories (id, titulo, ordem, ativo)
+VALUES ('celebracoes', 'Celebrações', 4, true)
+ON CONFLICT (id) DO UPDATE SET titulo = EXCLUDED.titulo, ordem = EXCLUDED.ordem;
+
+-- 2. CONFIGURAÇÃO GERAL DO CATÁLOGO
+INSERT INTO public.site_catalog_config (id, negocio, lista_cabecalho, fechamento, updated_at)
+VALUES (
+  'primary',
+  '{"@context":"https://schema.org","@type":"FoodEstablishment","@id":"https://dfariagastronomia.com.br#localbusiness","additionalType":"https://schema.org/CateringBusiness","name":"D''Faria Gastronomia e Eventos","description":"Buffet e gastronomia para casamentos, eventos corporativos, formaturas e celebrações, com mais de 38 anos de experiência.","url":"https://dfariagastronomia.com.br","image":"https://dfariagastronomia.com.br/og-dfaria.jpg","telephone":"+5515996834734","address":{"@type":"PostalAddress","streetAddress":"R. Quinze de Novembro, 910","addressLocality":"Cesário Lange","addressRegion":"SP","postalCode":"18285-049","addressCountry":"BR"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"17:00"}],"sameAs":["https://www.instagram.com/dfariagastronomia/","https://www.facebook.com/dfariagastronomia","https://www.google.com/maps/search/?api=1&query=D%27Faria%20Gastronomia%20e%20Eventos%20Ces%C3%A1rio%20Lange%20SP"],"areaServed":[{"@type":"City","name":"Cesário Lange"},{"@type":"City","name":"Tatuí"},{"@type":"City","name":"Boituva"},{"@type":"City","name":"Cerquilho"},{"@type":"City","name":"Tietê"},{"@type":"City","name":"Itapetininga"},{"@type":"City","name":"Conchas"},{"@type":"City","name":"Pereiras"},{"@type":"City","name":"Porangaba"}]}'::jsonb,
+  '{"title":"Cardápios | D''Faria Gastronomia e Eventos","description":"Cardápios do D''Faria Gastronomia e Eventos: almoços, jantares, fogo de chão e parrilla, festival de massas, crepes, brunches, cafés e celebrações.","sobretitulo":"Catálogo gastronômico","titulo":"Cardápios","chamada":"Experiências gastronômicas para diferentes formatos de eventos.","introducao":"Cada cardápio abaixo reúne composições já executadas pela cozinha do D’Faria Gastronomia e Eventos. Servem como ponto de partida: a proposta final é montada conforme o formato do seu evento.","imagem":{"src":"/__l5e/assets-v1/4f1f4baf-5e61-4d82-aa09-5d645503e757/parrilla-chef.webp","alt":"Chef do D’Faria preparando carnes na parrilla em evento"}}'::jsonb,
+  '{"titulo":"Cada evento pede uma composição própria","texto":"Os cardápios podem ser combinados com as estações gastronômicas do D’Faria e adaptados ao formato da celebração.","links":[{"href":"/gastronomia","texto":"Gastronomia"},{"href":"/eventos/casamentos","texto":"Casamentos"},{"href":"/eventos-corporativos","texto":"Eventos Corporativos"},{"href":"/churrasco-para-empresas","texto":"Churrasco para Empresas"},{"href":"/frios-e-finger-food","texto":"Ilhas de Frios e Finger Foods"}]}'::jsonb,
+  now()
+)
+ON CONFLICT (id) DO UPDATE SET
+  negocio = EXCLUDED.negocio,
+  lista_cabecalho = EXCLUDED.lista_cabecalho,
+  fechamento = EXCLUDED.fechamento,
+  updated_at = now();
+
+-- 3. CONFIGURAÇÃO DO MOTOR DE PREÇOS
+INSERT INTO public.site_pricing_config (id, fracao_compras, frete_medio, piso_margem, inclinacao_volume)
+VALUES ('primary', 0.3250, 1200.00, 0.3000, 0.000774)
+ON CONFLICT (id) DO NOTHING;
+
+-- 4. OS 17 CARDÁPIOS OFICIAIS
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'almoco-classico-com-mesa-de-frios',
+  'Almoço Clássico com Mesa de Frios',
+  'almocos-e-jantares',
+  'Almoço Clássico com Mesa de Frios | Cardápios D''Faria',
+  'Cardápio de almoço clássico do D''Faria: mesa de frios, salgados de entrada, lagarto ao molho madeira, sobrecoxa, penne, saladas e mesa de café.',
+  'Almoços e Jantares',
+  'Recepção com mesa de frios e salgados, seguida de almoço com carnes, massa e acompanhamentos.',
+  '{"src":"/__l5e/assets-v1/459e8554-24ce-4397-b95e-e3c6e7fa59fc/ilha-de-frios-evento-noturno-dfaria.webp","alt":"Ilha de frios montada pela equipe do D’Faria em evento noturno","largura":1280,"altura":960}'::jsonb,
+  '{"titulo":"Almoço Clássico com Mesa de Frios","resumo":"Recepção com mesa de frios e salgados, seguida de almoço com carnes, massa e acompanhamentos.","imagem":{"src":"/__l5e/assets-v1/459e8554-24ce-4397-b95e-e3c6e7fa59fc/ilha-de-frios-evento-noturno-dfaria.webp","alt":"Ilha de frios montada pela equipe do D’Faria em evento noturno","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Entradas","itens":["Risólis de presunto e queijo","Coxinha","Croquete de carne","Bolinha de queijo"]},{"titulo":"Mesa de frios","itens":["Presunto cozido","Queijo muçarela","Queijo prato","Queijo fresco","Lombo canadense","Salame italiano","Cesto de pães variados"]},{"titulo":"Pratos principais e acompanhamentos","itens":["Arroz branco","Arroz com brócolis","Lagarto ao molho madeira","Sobrecoxa de frango desossada e assada ao molho próprio","Penne tricolore ao molho bechamel","Legumes na manteiga"]},{"titulo":"Saladas","itens":["Salada de folhas verdes","Salada de macarrão e frios","Tabule"]},{"titulo":"Sobremesa","itens":["Sorvete de creme com calda quente de chocolate"]},{"titulo":"Mesa de café","itens":["Café","Petit four"]}]'::jsonb,
+  ARRAY['feijoada-completa', 'almoco-especial-de-carnes-e-peixe', 'almoco-franco-americano'],
+  'publicado',
+  1,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'feijoada-completa',
+  'Feijoada Completa',
+  'almocos-e-jantares',
+  'Feijoada Completa para Eventos | Cardápios D''Faria',
+  'Cardápio de feijoada completa do D''Faria: feijoada, arroz, couve refogada, torresmo, caldo de feijão, laranja laminada, sobremesas e mesa de café.',
+  'Almoços e Jantares',
+  'Feijoada servida com os acompanhamentos tradicionais, frutas laminadas e mesa de café.',
+  '{"src":"/__l5e/assets-v1/1b461df2-7fc8-421e-b2ed-1b3342313427/feijoada-panelas-de-barro-dfaria.webp","alt":"Feijoada servida em panelas de barro com arroz, couve e torresmo","largura":1280,"altura":960}'::jsonb,
+  '{"titulo":"Feijoada Completa","resumo":"Feijoada servida com os acompanhamentos tradicionais, frutas laminadas e mesa de café.","imagem":{"src":"/__l5e/assets-v1/1b461df2-7fc8-421e-b2ed-1b3342313427/feijoada-panelas-de-barro-dfaria.webp","alt":"Feijoada servida em panelas de barro com arroz, couve e torresmo","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Entradas","itens":["Coxinha","Bolinha de queijo","Risólis de presunto e queijo","Croquete de carne"]},{"titulo":"Prato principal e acompanhamentos","itens":["Feijoada","Arroz branco","Couve refogada","Torresmo","Caldo de feijão apimentado","Laranja laminada"]},{"titulo":"Sobremesas","itens":["Sorvete de creme com calda de chocolate","Abacaxi laminado","Melancia laminada"]},{"titulo":"Mesa de café","itens":["Café","Petit four","Bala de coco caseira"]}]'::jsonb,
+  ARRAY['almoco-classico-com-mesa-de-frios', 'almoco-especial-de-carnes-e-peixe', 'almoco-franco-americano'],
+  'publicado',
+  2,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'almoco-especial-de-carnes-e-peixe',
+  'Almoço Especial de Carnes e Peixe',
+  'almocos-e-jantares',
+  'Almoço Especial de Carnes e Peixe | Cardápios D''Faria',
+  'Cardápio de almoço especial do D''Faria: terrines, queijo Brie com favo de mel, arroz com bacalhau, tilápia, escalopinho de filé mignon e sobremesas.',
+  'Almoços e Jantares',
+  'Terrines e queijo Brie na entrada, tilápia e escalopinho de filé mignon nos pratos principais.',
+  '{"src":"/__l5e/assets-v1/67ace9da-8071-4626-812a-f63776a428b3/buffet-rechauds-saladas-dfaria.webp","alt":"Buffet completo montado com réchauds, saladas e acompanhamentos","largura":1280,"altura":960}'::jsonb,
+  '{"titulo":"Almoço Especial de Carnes e Peixe","resumo":"Terrines e queijo Brie na entrada, tilápia e escalopinho de filé mignon nos pratos principais.","imagem":{"src":"/__l5e/assets-v1/aa9f203f-0869-4295-9144-9a8ab0877cb2/almoco-buffet.webp","alt":"Buffet do almoço especial do D’Faria com réchauds, saladas e convidado se servindo","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Entradas","itens":["Coxinha","Croquete de carne","Bolinha de queijo","Esfirra de carne","Empadinha de palmito"]},{"titulo":"Mesa de frios","itens":["Terrine de nozes","Terrine de tomate seco","Queijo Brie com favo de mel de laranjeira","Torradas variadas"]},{"titulo":"Pratos principais","itens":["Arroz branco","Arroz com bacalhau","Filé de tilápia ao molho de manteiga e alcaparras","Escalopinho de filé mignon ao molho próprio com petit pois e tomate-cereja confitado","Legumes na manteiga","Feijão gordo"]},{"titulo":"Saladas","itens":["Salada de couve-flor, brócolis e vagem","Salada de folhas verdes com tomate-cereja e queijo branco","Tabule"]},{"titulo":"Sobremesas","itens":["Pudim de leite","Manjar branco com calda de frutas vermelhas","Pavê de Sonho de Valsa","Gelado de abacaxi"]},{"titulo":"Mesa de café","itens":["Café","Petit fours","Bala de coco caseira"]}]'::jsonb,
+  ARRAY['almoco-classico-com-mesa-de-frios', 'feijoada-completa', 'almoco-franco-americano'],
+  'publicado',
+  3,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'almoco-franco-americano',
+  'Almoço Franco-Americano',
+  'almocos-e-jantares',
+  'Almoço Franco-Americano | Cardápios D''Faria',
+  'Cardápio franco-americano do D''Faria: canapés, salgados, lagarto recheado, filé de frango ao molho de manteiga e alcaparras, penne ao pomodoro e saladas.',
+  'Almoços e Jantares',
+  'Canapés e salgados na recepção, lagarto recheado e filé de frango ao molho de manteiga e alcaparras.',
+  '{"src":"/__l5e/assets-v1/f4ef0018-2e70-437f-9026-c2f8a2094d3a/estacao-saladas-arroz-rechauds-dfaria.webp","alt":"Estação de saladas, arroz e acompanhamentos em réchauds de inox","largura":1280,"altura":960}'::jsonb,
+  '{"titulo":"Almoço Franco-Americano","resumo":"Canapés e salgados na recepção, lagarto recheado e filé de frango ao molho de manteiga e alcaparras.","imagem":{"src":"/__l5e/assets-v1/2599901a-ae0f-444d-ba53-3291e7ff2ab7/franco-amer-limpo.webp","alt":"Chef do D''Faria servindo prato em réchauds durante almoço de evento","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Canapés","itens":["Pasta de atum","Pasta de cenoura e alho","Pasta de frango"]},{"titulo":"Salgados","itens":["Coxinha","Risólis de presunto e queijo","Croquete de frango","Bolinha de queijo"]},{"titulo":"Pratos principais e acompanhamentos","itens":["Arroz branco","Lagarto recheado ao molho próprio","Filé de frango ao molho de manteiga e alcaparras","Penne ao pomodoro com manjericão fresco","Legumes na manteiga"]},{"titulo":"Saladas","itens":["Salada de folhas verdes","Salada arco-íris","Tabule"]},{"titulo":"Sobremesa","itens":["Sorvete de creme com calda de chocolate"]},{"titulo":"Mesa de café","itens":["Café","Petit fours","Bala de coco caseira"]}]'::jsonb,
+  ARRAY['almoco-classico-com-mesa-de-frios', 'feijoada-completa', 'almoco-especial-de-carnes-e-peixe'],
+  'publicado',
+  4,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'almoco-com-churrasco-e-mesa-de-frios',
+  'Almoço com Churrasco e Mesa de Frios',
+  'almocos-e-jantares',
+  'Almoço com Churrasco e Mesa de Frios | Cardápios D''Faria',
+  'Cardápio de almoço com churrasco do D''Faria: mesa de frios, picanha, fraldinha no alho, maminha, pancetta, queijo de coalho, pão de alho e saladas.',
+  'Almoços e Jantares',
+  'Mesa de frios na recepção e churrasco com picanha, fraldinha, maminha e pancetta.',
+  '{"src":"/__l5e/assets-v1/f5d93025-a81f-42d2-813d-992e74717a34/cortes-carne-parrilla-dfaria.webp","alt":"Cortes de carne na parrilla durante o preparo do churrasco","largura":1280,"altura":960}'::jsonb,
+  '{"titulo":"Almoço com Churrasco e Mesa de Frios","resumo":"Mesa de frios na recepção e churrasco com picanha, fraldinha, maminha e pancetta.","imagem":{"src":"/__l5e/assets-v1/65e349ef-9428-4750-9f8e-8e553c3590f0/churrasco-frios.webp","alt":"Mesa de frios e picanha assando na grelha do churrasco do D''Faria","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Entradas","itens":["Risólis de presunto e queijo","Coxinha","Croquete de carne","Bolinha de queijo"]},{"titulo":"Mesa de frios","itens":["Presunto cozido","Queijo muçarela","Queijo prato","Queijo fresco","Lombo canadense","Salame italiano","Peito de peru defumado","Cesto de pães variados"]},{"titulo":"Churrasco e acompanhamentos","itens":["Picanha","Fraldinha no alho","Maminha","Pancetta","Queijo de coalho","Pão de alho","Penne ao molho bechamel","Legumes na manteiga"]},{"titulo":"Saladas","itens":["Salada de folhas verdes","Salada arco-íris","Tabule"]},{"titulo":"Mesa de café","itens":["Café","Petit four"]}]'::jsonb,
+  ARRAY['almoco-classico-com-mesa-de-frios', 'feijoada-completa', 'almoco-especial-de-carnes-e-peixe'],
+  'publicado',
+  5,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'almoco-com-ilha-gastronomica',
+  'Almoço com Ilha Gastronômica',
+  'almocos-e-jantares',
+  'Almoço com Ilha Gastronômica | Cardápios D''Faria',
+  'Cardápio de almoço com ilha gastronômica do D''Faria: welcome gastronômico, mini wraps, tábuas de frios, lagarto assado, capeleti de carne e saladas.',
+  'Almoços e Jantares',
+  'Welcome gastronômico, ilha de frios e finger food e almoço com lagarto assado e capeleti.',
+  '{"src":"/__l5e/assets-v1/3869be41-0a5b-4c9f-b1d6-1e8f29c9f745/quadro-pasta-de-queijo-dfaria.webp","alt":"Quadro de pasta de queijo com flor de queijo e torradas servido em cavalete","largura":1280,"altura":960}'::jsonb,
+  '{"titulo":"Almoço com Ilha Gastronômica","resumo":"Welcome gastronômico, ilha de frios e finger food e almoço com lagarto assado e capeleti.","imagem":{"src":"/__l5e/assets-v1/3eabe5b3-e743-48b8-a03c-8fbf8b908d8b/ilha-gastro.webp","alt":"Mesa de ilha gastronômica com frios, canapés e mini burgers no jardim","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Welcome gastronômico","itens":["Águas saborizadas","Mini stick de queijo, tomate e pesto de manjericão","Canapés de kani com kiwi","Batatinhas com cheddar e crispis de bacon"]},{"titulo":"Ilha de frios e finger food","itens":["Mini wraps de rúcula, manga e tomate seco","Mini espetinhos de muçarela e tomate-cereja","Grisete de queijo com gergelim negro","Dadinhos de tapioca com geleia de pimenta"]},{"titulo":"Tábuas de frios","itens":["Presunto cozido","Queijo muçarela","Queijo gorgonzola","Salame italiano","Lombo canadense","Queijo minas","Peito de peru","Favo de mel de laranjeira","Terrine de tomate seco","Terrine de queijo roquefort com nozes","Cesto de pães variados"]},{"titulo":"Prato","itens":["Lagarto assado ao molho próprio","Filé de frango ao molho de manteiga e alcaparras","Arroz branco","Capeleti de carne com molho pomodoro e manjericão fresco","Mix de legumes na manteiga"]},{"titulo":"Saladas","itens":["Salada de folhas verdes e tomate-cereja","Salada libanesa","Salada tricolore","Molho italiano"]},{"titulo":"Sobremesa","itens":["Sorvete de creme com calda de chocolate"]},{"titulo":"Mesa de café","itens":["Café","Petit fours"]}]'::jsonb,
+  ARRAY['almoco-classico-com-mesa-de-frios', 'feijoada-completa', 'almoco-especial-de-carnes-e-peixe'],
+  'publicado',
+  6,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'almoco-completo-com-ilha-de-frios-e-finger-food',
+  'Almoço Completo com Ilha de Frios e Finger Food',
+  'almocos-e-jantares',
+  'Almoço Completo com Ilha de Frios e Finger Food | D''Faria',
+  'Cardápio completo do D''Faria: welcome gastronômico, tábuas de frios, risotinho de Brie com damasco, cupim, fraldinha, lombo suíno, massas e molhos.',
+  'Almoços e Jantares',
+  'Ampla seleção de frios, risotinho de Brie com damasco e variedade de proteínas, arroz e massas.',
+  '{"src":"/__l5e/assets-v1/6fc38a0a-3d07-431f-b286-34f3a223f085/entradas-individuais-bandeja-prata-dfaria.webp","alt":"Entradas individuais servidas em porções sobre bandeja de prata","largura":1280,"altura":960}'::jsonb,
+  '{"titulo":"Almoço Completo com Ilha de Frios e Finger Food","resumo":"Ampla seleção de frios, risotinho de Brie com damasco e variedade de proteínas, arroz e massas.","imagem":{"src":"/__l5e/assets-v1/6fc38a0a-3d07-431f-b286-34f3a223f085/entradas-individuais-bandeja-prata-dfaria.webp","alt":"Entradas individuais servidas em porções sobre bandeja de prata","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Welcome gastronômico","itens":["Águas saborizadas artesanais","Mini stick de queijo, tomate e pesto de manjericão","Canapés de kani com kiwi"]},{"titulo":"Entradas","itens":["Dadinho de tapioca com geleia de pimenta","Damasco turco com cream cheese","Grisete de queijo com gergelim negro","Mini batatas com cheddar e crispis de bacon"]},{"titulo":"Tábuas de frios","itens":["Queijo muçarela","Queijo fresco","Salame italiano","Presunto cozido","Queijo prato","Peito de peru","Salaminho","Queijo Brie trufado","Lombinho defumado","Favo de mel de laranjeira","Terrine de tomate seco","Terrine de queijo roquefort com nozes","Cesto de pães variados"]},{"titulo":"Comidinha","itens":["Risotinho de Brie com damasco"]},{"titulo":"Proteínas","itens":["Lagarto ao molho próprio com pétalas de cebola e tomate-cereja confitado","Fraldinha assada ao molho madeira","Cupim assado ao molho roti e ervilhas frescas","Iscas de carne aceboladas","Sobrecoxa de frango desossada e assada ao molho próprio","Filé de frango ao molho de manteiga e alcaparras","Lombo suíno fatiado ao molho ferrugem"]},{"titulo":"Arroz","itens":["Arroz branco","Arroz à grega","Arroz com alho e brócolis","Arroz com lâminas de amêndoas"]},{"titulo":"Massas","itens":["Penne","Nhoque","Farfale","Espaguete"]},{"titulo":"Molhos","itens":["Molho quatro queijos","Molho pomodoro com manjericão fresco","Molho bechamel","Molho rosé"]},{"titulo":"Saladas","itens":["Salada de folhas verdes","Salada arco-íris","Tabule"]},{"titulo":"Sobremesa","itens":["Manjar branco com calda de ameixa"]},{"titulo":"Mesa de café","itens":["Café","Petit fours"]}]'::jsonb,
+  ARRAY['almoco-classico-com-mesa-de-frios', 'feijoada-completa', 'almoco-especial-de-carnes-e-peixe'],
+  'publicado',
+  7,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'jantar-tradicional-de-frango',
+  'Jantar Tradicional com Strogonoff de Frango',
+  'almocos-e-jantares',
+  'Jantar Tradicional com Strogonoff de Frango | Cardápios D''Faria',
+  'Cardápio de jantar tradicional do D''Faria: salgados de entrada, estrogonofe de frango, arroz branco, espaguete ao alho e óleo, batata palha e saladas.',
+  'Almoços e Jantares',
+  'Estrogonofe de frango com arroz branco, espaguete ao alho e óleo e batata palha.',
+  '{"src":"/__l5e/assets-v1/01082954-1834-45ba-ac38-a766084ed011/strogonoff.webp","alt":"Estrogonofe de frango em réchaud com arroz branco e batata palha"}'::jsonb,
+  '{"titulo":"Jantar Tradicional com Strogonoff de Frango","resumo":"Estrogonofe de frango com arroz branco, espaguete ao alho e óleo e batata palha.","imagem":{"src":"/__l5e/assets-v1/01082954-1834-45ba-ac38-a766084ed011/strogonoff.webp","alt":"Estrogonofe de frango em réchaud com arroz branco e batata palha","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Entradas","itens":["Coxinha","Risólis de presunto e queijo","Risólis de pizza","Croquete de carne","Bolinha de queijo","Esfirra de carne","Empadinha de frango"]},{"titulo":"Pratos principais e acompanhamentos","itens":["Estrogonofe de frango","Arroz branco","Espaguete ao alho e óleo","Batata palha"]},{"titulo":"Saladas","itens":["Salada arco-íris","Salada de folhas verdes","Tabule"]},{"titulo":"Sobremesa","itens":["Sorvete de creme com calda de chocolate"]}]'::jsonb,
+  ARRAY['almoco-classico-com-mesa-de-frios', 'feijoada-completa', 'almoco-especial-de-carnes-e-peixe'],
+  'publicado',
+  8,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'jantar-completo-selecao-de-carnes-e-massas',
+  'Jantar Completo — Seleção de Carnes e Massas',
+  'almocos-e-jantares',
+  'Jantar Completo — Seleção de Carnes e Massas | D''Faria',
+  'Cardápio de jantar completo do D''Faria: lagarto, fraldinha ao molho madeira, sobrecoxa, lombo suíno, arroz à grega, massas, molhos, saladas e sobremesas.',
+  'Almoços e Jantares',
+  'Salgados fritos e assados na recepção, seleção de carnes assadas, arroz, massas e molhos.',
+  '{"src":"/__l5e/assets-v1/36214949-815e-48c9-9924-5fd1b74f2061/costela-em-cruz-brasa-dfaria.webp","alt":"Costela em cruz assando lentamente na brasa"}'::jsonb,
+  '{"titulo":"Jantar Completo — Seleção de Carnes e Massas","resumo":"Salgados fritos e assados na recepção, seleção de carnes assadas, arroz, massas e molhos.","imagem":{"src":"/__l5e/assets-v1/4b0fee6a-35dd-4415-9b7e-6f3f8672aebd/jantar-massas.webp","alt":"Réchauds com massas, arroz e carnes no jantar completo do D’Faria","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Salgados fritos","itens":["Coxinha","Risólis de presunto e queijo","Risólis de pizza","Pérola de queijo","Croquete de carne"]},{"titulo":"Salgados assados","itens":["Esfirra de carne","Esfirra de frango","Esfirra de brócolis e muçarela","Empada de frango","Enroladinho de salsicha"]},{"titulo":"Proteínas","itens":["Lagarto ao molho próprio com pétalas de cebola e tomate-cereja confitado","Fraldinha assada ao molho madeira","Iscas de carne aceboladas","Sobrecoxa de frango desossada e assada ao molho próprio","Filé de frango ao molho de manteiga e alcaparras","Lombo suíno fatiado ao molho ferrugem"]},{"titulo":"Arroz","itens":["Arroz branco","Arroz à grega","Arroz com alho e brócolis"]},{"titulo":"Massas","itens":["Penne","Conchiglione","Farfale","Espaguete"]},{"titulo":"Molhos","itens":["Molho quatro queijos","Molho pomodoro com manjericão fresco","Molho bechamel","Molho rosé"]},{"titulo":"Saladas","itens":["Salada de folhas verdes","Salada arco-íris","Tabule"]},{"titulo":"Sobremesas","itens":["Sorvete servido junto com bolo","Manjar branco com calda de frutas vermelhas"]},{"titulo":"Mesa de café","itens":["Café","Petit fours"]}]'::jsonb,
+  ARRAY['almoco-classico-com-mesa-de-frios', 'feijoada-completa', 'almoco-especial-de-carnes-e-peixe'],
+  'publicado',
+  9,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'jantar-completo-versao-especial',
+  'Jantar Completo — Versão Especial',
+  'almocos-e-jantares',
+  'Jantar Completo — Versão Especial | Cardápios D''Faria',
+  'Cardápio de jantar completo em versão especial do D''Faria: coxinha de costela, cupim ao molho roti, arroz com amêndoas, talharim, Caesar salad e sobremesas.',
+  'Almoços e Jantares',
+  'Versão ampliada do jantar completo, com mais salgados, cupim ao molho roti e Caesar salad.',
+  '{"src":"/__l5e/assets-v1/c0e064b2-86dc-4ca8-86ff-2ca80ee5b054/costela-de-chao-churrasco-dfaria.webp","alt":"Costela de chão sendo assada em estação de churrasco"}'::jsonb,
+  '{"titulo":"Jantar Completo — Versão Especial","resumo":"Versão ampliada do jantar completo, com mais salgados, cupim ao molho roti e Caesar salad.","imagem":{"src":"/__l5e/assets-v1/6cbf4afb-394c-49ac-9703-8531354edc8e/jantar-especial.webp","alt":"Réchauds do buffet do jantar completo versão especial do D’Faria","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Salgados fritos","itens":["Coxinha de frango","Coxinha de costela","Risólis de presunto e queijo","Risólis de pizza","Pérola de queijo","Croquete de carne","Croquete de frango"]},{"titulo":"Salgados assados","itens":["Esfirra de carne","Esfirra de frango","Esfirra de brócolis e queijo","Empada de palmito","Empada de frango","Enroladinho de salsicha"]},{"titulo":"Proteínas","itens":["Lagarto ao molho próprio com pétalas de cebola e tomate-cereja confitado","Fraldinha assada ao molho madeira","Cupim assado ao molho roti e ervilhas frescas","Iscas de carne aceboladas","Sobrecoxa de frango desossada e assada ao molho próprio","Filé de frango ao molho de manteiga e alcaparras","Lombo suíno fatiado ao molho ferrugem"]},{"titulo":"Arroz","itens":["Arroz branco","Arroz à grega","Arroz com alho e brócolis","Arroz com lâminas de amêndoas"]},{"titulo":"Massas","itens":["Penne","Talharim","Farfale","Espaguete"]},{"titulo":"Molhos","itens":["Molho quatro queijos","Molho pomodoro com manjericão fresco","Molho bechamel","Molho rosé"]},{"titulo":"Saladas","itens":["Salada de folhas verdes","Caesar salad","Salada arco-íris","Tabule"]},{"titulo":"Sobremesas","itens":["Sorvete servido junto com bolo","Manjar branco com calda de frutas vermelhas"]},{"titulo":"Mesa de café","itens":["Café","Petit fours"]}]'::jsonb,
+  ARRAY['almoco-classico-com-mesa-de-frios', 'feijoada-completa', 'almoco-especial-de-carnes-e-peixe'],
+  'publicado',
+  10,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'experiencia-de-fogo-de-chao-e-parrilla',
+  'Experiência de Fogo de Chão e Parrilla',
+  'experiencias-gastronomicas',
+  'Experiência de Fogo de Chão e Parrilla | Cardápios D''Faria',
+  'Cardápio de fogo de chão e parrilla do D''Faria: choripan, queijo de coalho, costela na estação de fogo de chão, fraldinha recheada, pancetta e acompanhamentos.',
+  'Experiências Gastronômicas',
+  'Costela na estação de fogo de chão e cortes na parrilla, com entradas quentes e acompanhamentos.',
+  '{"src":"/__l5e/assets-v1/072ac5a8-1ba6-49da-873c-e728a4e28f2e/costela-leitao-fogo-de-chao-dfaria.webp","alt":"Costelas, leitão, abacaxi e milho assando no fogo de chão","largura":1280,"altura":960}'::jsonb,
+  '{"titulo":"Experiência de Fogo de Chão e Parrilla","resumo":"Costela na estação de fogo de chão e cortes na parrilla, com entradas quentes e acompanhamentos.","imagem":{"src":"/__l5e/assets-v1/b49f2133-c5eb-4d37-90fa-89a9304eaf98/fogo-chao-parrilla.webp","alt":"Chef do D’Faria fatiando carnes na parrilla com linguiças e brasa","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Entradas","itens":["Choripan","Mandioca acebolada na manteiga e bacon","Queijo de coalho com melado de cana","Abacaxi temperado com especiarias e raspas de limão","Ovinhos de codorna ao molho rosé"]},{"titulo":"Churrasco na parrilla e fogo de chão","itens":["Fraldinha enrolada e recheada com cebola","Pancetta","Costela na estação de fogo de chão","Linguiça toscana","Pão de alho","Sobrecoxa de frango"]},{"titulo":"Acompanhamentos","itens":["Feijão gordo com calabresa e bacon","Arroz branco","Arroz com brócolis e alho","Legumes na manteiga","Penne ao molho pomodoro com manjericão fresco","Farofa de maracujá e especiarias"]},{"titulo":"Saladas","itens":["Salada de maionese","Vinagrete de abacaxi","Salada de folhas verdes, tomate-cereja e lascas de parmesão","Salada libanesa"]},{"titulo":"Sobremesas","itens":["Pudim de leite","Manjar branco com calda de frutas vermelhas","Doce de abóbora caseiro","Melancia laminada","Abacaxi laminado"]},{"titulo":"Mesa de café","itens":["Café","Petit fours"]}]'::jsonb,
+  ARRAY['festival-de-massas', 'crepes-franceses'],
+  'publicado',
+  11,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'festival-de-massas',
+  'Festival de Massas',
+  'experiencias-gastronomicas',
+  'Festival de Massas para Eventos | Cardápios D''Faria',
+  'Cardápio de festival de massas do D''Faria: penne, ravióli, capeleti de carne, rondeli ao quatro queijos, gravatinhas e molhos bechamel, pomodoro e rosé.',
+  'Experiências Gastronômicas',
+  'Cinco massas combinadas com três molhos, encerrando com sorvete e brownie de chocolate.',
+  '{"src":"/__l5e/assets-v1/325a03f4-d2d2-484f-b6ca-57f5bdce870d/batatas-ao-murro-legumes-dfaria.webp","alt":"Batatas ao murro e legumes salteados servidos em travessas de cristal"}'::jsonb,
+  '{"titulo":"Festival de Massas","resumo":"Cinco massas combinadas com três molhos, encerrando com sorvete e brownie de chocolate.","imagem":{"src":"/__l5e/assets-v1/6d2219e1-2249-40d1-bd24-6dd1d51fb2e4/festival-massas.webp","alt":"Buffet com massas, molhos e acompanhamentos em travessas no festival de massas do D’Faria","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Entradas","itens":["Coxinha","Croquete de carne","Risólis de presunto e queijo","Bolinha de queijo"]},{"titulo":"Massas","itens":["Penne","Ravióli","Capeleti de carne","Rondeli de presunto e queijo ao quatro queijos","Gravatinhas"]},{"titulo":"Molhos","itens":["Molho bechamel","Molho pomodoro com manjericão fresco","Molho rosé"]},{"titulo":"Sobremesa","itens":["Sorvete de creme servido com brownie de chocolate"]},{"titulo":"Mesa de café","itens":["Café","Petit fours","Bala de coco caseira"]}]'::jsonb,
+  ARRAY['experiencia-de-fogo-de-chao-e-parrilla', 'crepes-franceses'],
+  'publicado',
+  12,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'crepes-franceses',
+  'Crepes Franceses',
+  'experiencias-gastronomicas',
+  'Crepes Franceses para Eventos | Cardápios D''Faria',
+  'Cardápio de crepes franceses do D''Faria: canapés, crepes de filé mignon, frango com catupiry, creme de palmito e crepes doces de brigadeiro e doce de leite.',
+  'Experiências Gastronômicas',
+  'Crepes salgados e doces preparados na estação, com canapés e saladas para acompanhar.',
+  '{"src":"/__l5e/assets-v1/4ad27679-cd18-4f5a-b960-7a081fd47ba1/queijo-empanado-colheres-dfaria.webp","alt":"Queijo empanado em colheres individuais com geleia de pimenta"}'::jsonb,
+  '{"titulo":"Crepes Franceses","resumo":"Crepes salgados e doces preparados na estação, com canapés e saladas para acompanhar.","imagem":{"src":"/__l5e/assets-v1/f731da3d-f646-4202-ab08-c8214830018a/crepes-franceses.webp","alt":"Chefs do D’Faria preparando crepes na estação do festival","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Canapés","itens":["Pasta de roquefort com nozes","Pasta de azeitonas","Pasta de páprica picante","Dadinho de tapioca com geleia de pimenta","Stick de tomate-cereja, queijo branco e manjericão"]},{"titulo":"Crepes salgados","itens":["Iscas de filé mignon","Frango com catupiry","Presunto e queijo","Queijo, tomate e manjericão fresco","Creme de palmito"]},{"titulo":"Molhos","itens":["Molho ao sugo","Molho bechamel"]},{"titulo":"Saladas","itens":["Salada de folhas verdes e tomates-cereja","Salada arco-íris","Tabule","Molho italiano"]},{"titulo":"Crepes doces","itens":["Brigadeiro mole","Doce de leite","Beijinho","Sorvete de creme"]},{"titulo":"Mesa de café","itens":["Café","Petit fours"]}]'::jsonb,
+  ARRAY['experiencia-de-fogo-de-chao-e-parrilla', 'festival-de-massas'],
+  'publicado',
+  13,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'brunch-com-pizza',
+  'Brunch com Pizza',
+  'cafes-e-brunches',
+  'Brunch com Pizza para Eventos | Cardápios D''Faria',
+  'Cardápio de brunch com pizza do D''Faria: frutas, mesa de frios, pizzas marguerita, calabresa e frango com catupiry, saladas, bolos caseiros e doces.',
+  'Cafés e Brunches',
+  'Frutas, mesa de frios, pizzas, bolos caseiros e doces em um só serviço.',
+  '{"src":"/__l5e/assets-v1/304ada36-9daa-425e-a89e-3d761bb4ab1f/mesa-frutas-esculpidas-ano-novo-dfaria.webp","alt":"Mesa de frutas esculpidas com melancia decorada para celebração de ano novo"}'::jsonb,
+  '{"titulo":"Brunch com Pizza","resumo":"Frutas, mesa de frios, pizzas, bolos caseiros e doces em um só serviço.","imagem":{"src":"/__l5e/assets-v1/0c2fd4b2-48f1-4bbf-b2a8-da53847207e3/brunch-pizza.webp","alt":"Pizzas variadas no buffet do brunch do D’Faria","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Frutas","itens":["Abacaxi","Melão","Melancia"]},{"titulo":"Mesa de frios","itens":["Queijo prato","Queijo muçarela","Queijo fresco","Peito de peru","Lombo canadense","Salame italiano","Requeijão cremoso","Manteiga","Pães variados"]},{"titulo":"Pizzas","itens":["Marguerita","Calabresa","Frango com catupiry","Muçarela"]},{"titulo":"Saladas","itens":["Salada de folhas verdes","Salada arco-íris","Tabule","Molho italiano"]},{"titulo":"Doces","itens":["Doce de abóbora","Manjar branco com calda de frutas vermelhas","Cocada mole","Geleia de morango"]},{"titulo":"Bolos","itens":["Bolo de cenoura com chocolate","Bolo de limão com mousse de limão e raspas de limão-siciliano"]},{"titulo":"Salgados","itens":["Mini coxinha","Risólis de pizza","Bolinha de queijo"]}]'::jsonb,
+  ARRAY['cafe-colonial', 'cafe-da-manha-com-mini-sanduiches'],
+  'publicado',
+  14,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'cafe-colonial',
+  'Café Colonial',
+  'cafes-e-brunches',
+  'Café Colonial para Eventos | Cardápios D''Faria',
+  'Cardápio de café colonial do D''Faria: frutas, patês de roquefort e creme de cebolas, frios, pães variados e bolos de chocolate, coco, cenoura e laranja.',
+  'Cafés e Brunches',
+  'Frutas, patês, frios, cinco tipos de pães e bolos caseiros servidos em mesa farta.',
+  '{"src":"/__l5e/assets-v1/be435124-accd-4c55-bf76-1d89a7d68b46/estacao-cafe-samovar-dfaria.webp","alt":"Estação de café com samovar montada ao ar livre","largura":1280,"altura":960}'::jsonb,
+  '{"titulo":"Café Colonial","resumo":"Frutas, patês, frios, cinco tipos de pães e bolos caseiros servidos em mesa farta.","imagem":{"src":"/__l5e/assets-v1/1faebd38-0570-407c-8803-746333eab8ce/cafe-colonial.webp","alt":"Mesa farta do café colonial do D’Faria com bolos, pães, frios e frutas","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Frutas","itens":["Abacaxi","Melão","Mamão","Melancia"]},{"titulo":"Frios","itens":["Patê de roquefort","Patê de creme de cebolas","Queijo prato","Queijo muçarela","Queijo fresco","Peito de peru","Requeijão cremoso","Manteiga"]},{"titulo":"Pães","itens":["Pão de forma","Pão de batata","Pão integral","Pão francês","Pão de leite"]},{"titulo":"Bolos","itens":["Bolo de chocolate","Bolo de coco","Bolo de cenoura com chocolate","Bolo de laranja"]}]'::jsonb,
+  ARRAY['brunch-com-pizza', 'cafe-da-manha-com-mini-sanduiches'],
+  'publicado',
+  15,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'cafe-da-manha-com-mini-sanduiches',
+  'Café da Manhã com Mini Sanduíches',
+  'cafes-e-brunches',
+  'Café da Manhã com Mini Sanduíches | Cardápios D''Faria',
+  'Cardápio de café da manhã do D''Faria: mini sanduíches em pão de forma, cebola, batata, cenoura e australiano, salgados, bolos caseiros e frutas laminadas.',
+  'Cafés e Brunches',
+  'Mini sanduíches em pães variados, salgados, bolos caseiros e frutas laminadas.',
+  '{"src":"/__l5e/assets-v1/31a1d39e-b1bf-48ce-98b7-ab81dfe63ad7/pasta-queijo-pimenta-biquinho-dfaria.webp","alt":"Pasta de queijo com pimenta biquinho servida com torradas"}'::jsonb,
+  '{"titulo":"Café da Manhã com Mini Sanduíches","resumo":"Mini sanduíches em pães variados, salgados, bolos caseiros e frutas laminadas.","imagem":{"src":"/__l5e/assets-v1/3cd5f5bb-c029-4468-a448-78d119de3b20/cafe-mini-sanduiches.webp","alt":"Mesa do café da manhã do D’Faria com mini sanduíches coloridos e canapés","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Salgados","itens":["Croquete de carne","Bolinha de queijo","Empada de frango","Esfirra de carne"]},{"titulo":"Mini sanduíches","itens":["Mini sanduíche de presunto e queijo no pão de forma","Mini sanduíche de frango no pão de cebola","Mini sanduíche de presunto e queijo no pão de batata","Mini sanduíche de peito de peru e cream cheese no pão de cenoura","Mini sanduíche de lombo canadense e queijo prato no pão australiano"]},{"titulo":"Bolos e doces","itens":["Bolo de cenoura com chocolate","Bolo de limão com cobertura e raspas de limão-siciliano","Bolo de fubá com cobertura de goiabada cremosa","Manjar branco com calda de frutas vermelhas"]},{"titulo":"Frutas","itens":["Abacaxi laminado","Melão laminado","Melancia laminada"]}]'::jsonb,
+  ARRAY['brunch-com-pizza', 'cafe-colonial'],
+  'publicado',
+  16,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
+
+INSERT INTO public.site_menus (
+  slug, nome, categoria_id, title, description, sobretitulo, resumo, foto_capa, cartao, secoes, outros, status, ordem, updated_at
+) VALUES (
+  'debutante-ilha-de-frios-e-massa',
+  'Debutante — Ilha de Frios e Massa',
+  'celebracoes',
+  'Cardápio de Debutante — Ilha de Frios e Massa | D''Faria',
+  'Cardápio de festa de debutante do D''Faria: salgados, ilha de frios com terrines, grisete de queijo, kani com kiwi, saladas e penne ao molho pomodoro.',
+  'Celebrações',
+  'Ilha de frios com terrines e grisete de queijo, seguida de penne ao pomodoro.',
+  '{"src":"/__l5e/assets-v1/cfb6c4b2-4dcf-4534-9859-4cfe876010ee/queijo-brie-frutas-vermelhas-dfaria.webp","alt":"Queijo brie com geleia de frutas vermelhas, morangos e amoras sobre tábua de madeira","largura":1280,"altura":960}'::jsonb,
+  '{"titulo":"Debutante — Ilha de Frios e Massa","resumo":"Ilha de frios com terrines e grisete de queijo, seguida de penne ao pomodoro.","imagem":{"src":"/__l5e/assets-v1/1edfb923-6c29-469c-ac59-3d58e3d54562/debutante-ilha-frios.webp","alt":"Mesa de frios com terrines, pães e convidados no evento do D’Faria","largura":1280,"altura":960}}'::jsonb,
+  '[{"titulo":"Salgados","itens":["Coxinha","Risólis de presunto e queijo","Bolinha de queijo","Croquete de carne","Esfirra de carne","Empadinha de frango"]},{"titulo":"Ilha de frios","itens":["Peito de peru","Presunto cozido","Queijo prato","Queijo muçarela","Lombo canadense","Salame italiano","Terrine de tomate seco","Terrine de roquefort com nozes e favo de mel de laranjeira","Grisete de queijo com gergelim negro","Kani kama com kiwi","Cesto de pães variados"]},{"titulo":"Saladas","itens":["Salada de folhas verdes","Tabule","Salada de tomate-cereja, queijo branco e manjericão fresco","Pães variados"]},{"titulo":"Massa","itens":["Penne ao molho pomodoro com manjericão fresco e queijo ralado"]},{"titulo":"Sobremesa","itens":["Sorvete de creme com calda de chocolate"]}]'::jsonb,
+  '{}'::text[],
+  'publicado',
+  17,
+  now()
+)
+ON CONFLICT (slug) DO UPDATE SET
+  nome = EXCLUDED.nome,
+  categoria_id = EXCLUDED.categoria_id,
+  title = EXCLUDED.title,
+  description = EXCLUDED.description,
+  sobretitulo = EXCLUDED.sobretitulo,
+  resumo = EXCLUDED.resumo,
+  foto_capa = EXCLUDED.foto_capa,
+  cartao = EXCLUDED.cartao,
+  secoes = EXCLUDED.secoes,
+  outros = EXCLUDED.outros,
+  status = EXCLUDED.status,
+  ordem = EXCLUDED.ordem,
+  updated_at = now();
