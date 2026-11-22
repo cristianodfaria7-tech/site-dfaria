@@ -3545,116 +3545,154 @@ function renderPageEditor(p) {
 // Aba 1 da Página: Banner Principal (Hero)
 function renderPageTabBanner(p) {
   const h = p.hero || {};
+  const isHome = p.id === 'home';
+
   return `
-    <div class="space-y-5">
-      <div>
-        <label class="block text-xs font-bold text-stone-700 mb-1">Título Principal do Banner (H1):</label>
-        <input type="text" id="page-hero-title" value="${h.titulo || ''}" class="w-full py-2.5 px-3.5 rounded-xl border border-stone-300 font-bold text-base text-dfgreen focus:ring-2 focus:ring-dfgreen outline-none" placeholder="Ex: Buffet para Casamentos" />
+    <div class="space-y-6">
+      
+      <!-- CARD 1: EDIÇÃO INDEPENDENTE DE TEXTOS DA HERO (TÍTULO E SUBTÍTULO) -->
+      <div class="p-6 rounded-2xl bg-white border border-stone-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-dfgreen/10 text-dfgreen flex items-center justify-center font-bold">
+              <i data-lucide="type" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-dfgreen">Textos da Hero (Título & Subtítulo)</h3>
+              <p class="text-[11px] text-stone-500">Edite apenas o texto com segurança absoluta — a foto e o vídeo NÃO serão alterados.</p>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-dfsand text-dfgreen border border-stone-200">
+            TEXTO ISOLADO
+          </span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Título Principal da Hero (H1):</label>
+          <input type="text" id="page-hero-title" value="${h.titulo || ''}" class="w-full py-2.5 px-3.5 rounded-xl border border-stone-300 font-bold text-base text-dfgreen focus:ring-2 focus:ring-dfgreen outline-none" placeholder="Ex: D'FARIA GASTRONOMIA" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Subtítulo / Frase de Apresentação:</label>
+          <textarea id="page-hero-subtitle" rows="3" class="w-full py-2 px-3 rounded-xl border border-stone-300 text-xs text-stone-700 focus:ring-2 focus:ring-dfgreen outline-none leading-relaxed" placeholder="Frase de apresentação no início da página">${h.subtitulo || ''}</textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-between">
+          <p class="text-[11px] text-stone-500 flex items-center gap-1">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-dfgreen"></i>
+            <span>Salva imediatamente o texto mantendo o vídeo/foto atual intacto.</span>
+          </p>
+          <button id="btn-save-hero-text" type="button" class="py-2.5 px-5 bg-dfgreen hover:bg-dfgreendeep text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer">
+            <i data-lucide="check" class="w-4 h-4 text-dfgold"></i>
+            <span>Salvar Apenas Textos da Hero</span>
+          </button>
+        </div>
       </div>
 
-      <div>
-        <label class="block text-xs font-bold text-stone-700 mb-1">Subtítulo / Chamada de Destaque:</label>
-        <textarea id="page-hero-subtitle" rows="2" class="w-full py-2 px-3 rounded-xl border border-stone-300 text-xs text-stone-700 focus:ring-2 focus:ring-dfgreen outline-none" placeholder="Frase de apresentação no início da página">${h.subtitulo || ''}</textarea>
-      </div>
-
-      <!-- Status Hero Cinematográfica Fasano -->
-      ${p.id === 'home' ? `
-        <div class="p-4 rounded-2xl bg-gradient-to-r from-dfgreen/10 via-dfgold/15 to-transparent border border-dfgold/30 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-dfgreen text-dfgold flex items-center justify-center font-bold shadow-sm">
-              <i data-lucide="video" class="w-5 h-5"></i>
+      <!-- CARD 2: MÍDIA DA HERO (VÍDEO / FOTO DE FUNDO) -->
+      <div class="p-6 rounded-2xl bg-white border border-stone-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-dfgold/20 text-dfgreen flex items-center justify-center font-bold">
+              <i data-lucide="${isHome ? 'film' : 'image'}" class="w-4 h-4 text-dfgold"></i>
             </div>
             <div>
-              <p class="text-xs font-bold text-dfgreen flex items-center gap-1.5">
-                <span>Hero Cinematográfica em Vídeo Full HD (Padrão Fasano)</span>
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-dfgreen text-white">ATIVO NO AR</span>
-              </p>
-              <p class="text-[11px] text-stone-600">Vídeo real do buffet em loop contínuo com carregamento no byte zero e iluminação cênica sem véu escuro.</p>
+              <h3 class="text-sm font-bold text-dfgreen">Mídia da Hero (${isHome ? 'Vídeo Cinematográfico Fasano' : 'Foto de Capa'})</h3>
+              <p class="text-[11px] text-stone-500">${isHome ? 'Vídeo real em Full HD 60fps rodando no fundo da página inicial.' : 'Imagem de alta gastronomia para o banner desta página.'}</p>
             </div>
           </div>
-          <a href="/" target="_blank" class="py-1.5 px-3 rounded-xl bg-dfgreen text-white text-xs font-bold hover:bg-dfgreendeep transition-all shadow-sm flex items-center gap-1 shrink-0">
-            <span>Assistir no Site</span>
-            <i data-lucide="external-link" class="w-3.5 h-3.5 text-dfgold"></i>
-          </a>
-        </div>
-      ` : ''}
-
-      <!-- Foto do Banner Hero -->
-      <div class="p-5 rounded-2xl bg-dfsand/60 border border-stone-200 space-y-3">
-        <label class="block text-xs font-bold text-dfgreen">Imagem do Banner Principal:</label>
-        <div class="flex flex-col sm:flex-row items-center gap-5">
-          <div class="w-48 h-32 rounded-2xl overflow-hidden bg-stone-200 border border-stone-300 relative shrink-0 shadow-sm">
-            <img id="page-preview-hero-img" src="${h.imagem?.src || '/og-dfaria.jpg'}" alt="${h.imagem?.alt || 'Banner'}" class="w-full h-full object-cover" />
-          </div>
-          <div class="space-y-3 flex-1 w-full">
-            <div>
-              <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Enviar Nova Imagem:</label>
-              <input type="file" id="page-file-hero" accept="image/*" class="text-xs text-stone-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-dfgreen file:text-white hover:file:bg-dfgreendeep cursor-pointer" />
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Ou Cole a URL da Imagem:</label>
-              <input type="text" id="page-hero-img-src" value="${h.imagem?.src || ''}" class="w-full py-1.5 px-3 rounded-lg border border-stone-300 text-xs text-stone-700 focus:ring-2 focus:ring-dfgreen outline-none" />
-            </div>
-          </div>
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold ${isHome ? 'bg-dfgreen text-white' : 'bg-stone-100 text-stone-600'}">
+            ${isHome ? 'VÍDEO FASANO ATIVO' : 'FOTO ATIVA'}
+          </span>
         </div>
 
-        <!-- Capas Imponentes Recomendadas em 1 Clique -->
-        <div class="pt-3 border-t border-stone-200/80">
-          <label class="block text-[11px] font-bold text-dfgreen mb-2 flex items-center gap-1.5">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-dfgold"></i>
-            <span>Capas Imponentes Disponíveis (Clique para aplicar imediatamente):</span>
-          </label>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/assets/hero-dfaria-luxo.jpg" data-alt="Banquete de alta gastronomia e buffet para eventos — D’Faria Gastronomia">
-              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
-                <img src="/assets/hero-dfaria-luxo.jpg" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+        ${isHome ? `
+          <!-- Painel Especial da Home: Vídeo Fasano Protegido -->
+          <div class="p-4 rounded-xl bg-dfsand/60 border border-stone-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-16 h-12 rounded-lg overflow-hidden bg-black shrink-0 border border-stone-300 relative">
+                  <img src="/assets/hero-cinematic-poster.jpg" alt="Poster do Vídeo" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <i data-lucide="play" class="w-4 h-4 text-white fill-white"></i>
+                  </div>
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-dfgreen">Vídeo de Champagne & Taças de Cristal (60fps Full HD)</p>
+                  <p class="text-[10px] text-stone-500">Arquivo: /assets/dfaria-hero-cinematic.mp4 · Padrão Fasano</p>
+                </div>
               </div>
-              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🌟 Banquete Sunset Luxo (16:9)</p>
-              <p class="text-[9px] text-stone-400">Cinematográfico / Noturno</p>
-            </button>
-            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/1472106d-603b-4c1a-9f89-7b8fdf1f18ef/hero-mesa-piscina.webp" data-alt="Mesa posta de alta gastronomia junto à piscina — D’Faria">
-              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
-                <img src="/__l5e/assets-v1/1472106d-603b-4c1a-9f89-7b8fdf1f18ef/hero-mesa-piscina.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+              <a href="/" target="_blank" class="py-1.5 px-3 rounded-lg bg-dfgreen text-white text-xs font-bold hover:bg-dfgreendeep transition-all shadow-sm flex items-center gap-1 shrink-0">
+                <span>Ver no Site</span>
+                <i data-lucide="external-link" class="w-3.5 h-3.5 text-dfgold"></i>
+              </a>
+            </div>
+
+            <!-- Trava de Segurança para NÃO Mudar Mídia Sem Querer -->
+            <div class="pt-2 border-t border-stone-200/70">
+              <label class="flex items-center gap-2 text-xs font-semibold text-stone-700 cursor-pointer">
+                <input type="checkbox" id="chk-allow-media-change" class="w-4 h-4 text-dfgreen rounded focus:ring-dfgreen" />
+                <span>Habilitar alteração de mídia (manter desmarcado para preservar o vídeo Fasano)</span>
+              </label>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Seletor de Imagem (só ativo se for outra página ou se o chef marcou a trava na home) -->
+        <div id="media-change-container" class="${isHome ? 'hidden' : 'space-y-4'}">
+          <div class="flex flex-col sm:flex-row items-center gap-5">
+            <div class="w-48 h-32 rounded-2xl overflow-hidden bg-stone-200 border border-stone-300 relative shrink-0 shadow-sm">
+              <img id="page-preview-hero-img" src="${h.imagem?.src || '/og-dfaria.jpg'}" alt="${h.imagem?.alt || 'Banner'}" class="w-full h-full object-cover" />
+            </div>
+            <div class="space-y-3 flex-1 w-full">
+              <div>
+                <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Enviar Nova Imagem de Capa:</label>
+                <input type="file" id="page-file-hero" accept="image/*" class="text-xs text-stone-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-dfgreen file:text-white hover:file:bg-dfgreendeep cursor-pointer" />
               </div>
-              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🏊 Mesa Piscina (Original)</p>
-              <p class="text-[9px] text-stone-400">Ar Livre / Clássico</p>
-            </button>
-            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/5a856cc3-8d4b-4c1c-9238-6c6e2cac0104/churrasco-fogo-de-chao-evento-dfaria.webp" data-alt="Churrasco Fogo de Chão D’Faria">
-              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
-                <img src="/__l5e/assets-v1/5a856cc3-8d4b-4c1c-9238-6c6e2cac0104/churrasco-fogo-de-chao-evento-dfaria.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+              <div>
+                <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Ou Cole a URL da Imagem:</label>
+                <input type="text" id="page-hero-img-src" value="${h.imagem?.src || ''}" class="w-full py-1.5 px-3 rounded-lg border border-stone-300 text-xs text-stone-700 focus:ring-2 focus:ring-dfgreen outline-none" />
               </div>
-              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🥩 Fogo de Chão & Brasa</p>
-              <p class="text-[9px] text-stone-400">Carnes Nobres & Parrilla</p>
-            </button>
-            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/d9e32d7c-dd7e-46de-b79b-739f373ae6b5/ilha-frios-mesa-madeira-jardim.webp" data-alt="Ilha de Frios no Jardim D’Faria">
-              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
-                <img src="/__l5e/assets-v1/d9e32d7c-dd7e-46de-b79b-739f373ae6b5/ilha-frios-mesa-madeira-jardim.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-              </div>
-              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🧀 Ilha Gourmet de Frios</p>
-              <p class="text-[9px] text-stone-400">Mesa Rústica de Jardim</p>
-            </button>
-            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/e5d011ca-5a5d-4743-8fa0-987e11261d08/salao-mesas-redondas-recepcao-dfaria.webp" data-alt="Salão Nobre para Casamentos D’Faria">
-              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
-                <img src="/__l5e/assets-v1/e5d011ca-5a5d-4743-8fa0-987e11261d08/salao-mesas-redondas-recepcao-dfaria.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-              </div>
-              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🏛️ Salão Recepção Nobre</p>
-              <p class="text-[9px] text-stone-400">Casamentos & Gala</p>
-            </button>
-            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/455b55ff-e44a-494e-8d42-9ec932b0f072/mesas-montadas-evento-ar-livre-dfaria.webp" data-alt="Mesas montadas em evento ao ar livre D’Faria">
-              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
-                <img src="/__l5e/assets-v1/455b55ff-e44a-494e-8d42-9ec932b0f072/mesas-montadas-evento-ar-livre-dfaria.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-              </div>
-              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🌿 Mesas ao Ar Livre</p>
-              <p class="text-[9px] text-stone-400">Jardim & Celebração</p>
-            </button>
+            </div>
+          </div>
+
+          <!-- Capas Imponentes Disponíveis -->
+          <div class="pt-3 border-t border-stone-200/80">
+            <label class="block text-[11px] font-bold text-dfgreen mb-2 flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-dfgold"></i>
+              <span>Capas Imponentes Disponíveis (Clique para aplicar se desejar):</span>
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/assets/hero-dfaria-luxo.jpg" data-alt="Banquete de alta gastronomia e buffet para eventos — D’Faria Gastronomia">
+                <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
+                  <img src="/assets/hero-dfaria-luxo.jpg" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                </div>
+                <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🌟 Banquete Sunset Luxo (16:9)</p>
+                <p class="text-[9px] text-stone-400">Cinematográfico / Noturno</p>
+              </button>
+              <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/1472106d-603b-4c1a-9f89-7b8fdf1f18ef/hero-mesa-piscina.webp" data-alt="Mesa posta de alta gastronomia junto à piscina — D’Faria">
+                <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
+                  <img src="/__l5e/assets-v1/1472106d-603b-4c1a-9f89-7b8fdf1f18ef/hero-mesa-piscina.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                </div>
+                <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🏊 Mesa Piscina (Original)</p>
+                <p class="text-[9px] text-stone-400">Ar Livre / Clássico</p>
+              </button>
+              <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/5a856cc3-8d4b-4c1c-9238-6c6e2cac0104/churrasco-fogo-de-chao-evento-dfaria.webp" data-alt="Churrasco Fogo de Chão D’Faria">
+                <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
+                  <img src="/__l5e/assets-v1/5a856cc3-8d4b-4c1c-9238-6c6e2cac0104/churrasco-fogo-de-chao-evento-dfaria.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                </div>
+                <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🥩 Fogo de Chão & Brasa</p>
+                <p class="text-[9px] text-stone-400">Carnes Nobres & Parrilla</p>
+              </button>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   `;
 }
 
-// Aba 2 da Página: Seções & Textos
 function renderPageTabSecoes(p) {
   const secoes = p.secoes || [];
   return `
@@ -4097,6 +4135,40 @@ function attachDashboardEvents() {
   });
 
   // Salvar Página
+  
+  // Salvar Apenas Textos da Hero (sem mexer em foto ou vídeo)
+  const btnSaveHeroText = document.getElementById('btn-save-hero-text');
+  if (btnSaveHeroText && state.selectedPage) {
+    btnSaveHeroText.addEventListener('click', async () => {
+      syncPageFormDataToState({ onlyText: true });
+      state.loading = true;
+      render();
+
+      try {
+        await api.savePage(state.selectedPage);
+        state.feedback = { type: 'success', text: '✅ Textos da Hero salvos com sucesso! A foto e o vídeo foram 100% preservados sem alterações.' };
+      } catch (err) {
+        state.feedback = { type: 'error', text: err.message };
+      } finally {
+        state.loading = false;
+        render();
+        setTimeout(() => { state.feedback = null; render(); }, 4000);
+      }
+    });
+  }
+
+  // Trava de segurança para alterar mídia na Home
+  const chkMediaChange = document.getElementById('chk-allow-media-change');
+  if (chkMediaChange) {
+    chkMediaChange.addEventListener('change', () => {
+      const container = document.getElementById('media-change-container');
+      if (container) {
+        if (chkMediaChange.checked) container.classList.remove('hidden');
+        else container.classList.add('hidden');
+      }
+    });
+  }
+
   const btnSavePage = document.getElementById('btn-save-page');
   if (btnSavePage && state.selectedPage) {
     btnSavePage.addEventListener('click', async () => {
@@ -4341,31 +4413,50 @@ function attachDashboardEvents() {
 }
 
 // Sincroniza campos da Página antes de salvar
-function syncPageFormDataToState() {
+function syncPageFormDataToState(opts = {}) {
   const p = state.selectedPage;
   if (!p) return;
 
   const hTitle = document.getElementById('page-hero-title');
   if (hTitle) {
     if (!p.hero) p.hero = {};
-    p.hero.titulo = hTitle.value;
+    p.hero.titulo = hTitle.value.trim();
   }
 
   const hSub = document.getElementById('page-hero-subtitle');
   if (hSub) {
     if (!p.hero) p.hero = {};
-    p.hero.subtitulo = hSub.value;
+    p.hero.subtitulo = hSub.value.trim();
   }
 
-  const hSrc = document.getElementById('page-hero-img-src');
-  if (hSrc) {
-    if (!p.hero) p.hero = {};
-    if (!p.hero.imagem) p.hero.imagem = { src: '', alt: p.nome };
-    let val = hSrc.value.trim();
-    if (val.includes('/reviews/')) {
-      val = '/assets/hero-dfaria-luxo.jpg';
+  // Preservação de mídia se for apenas texto ou se for home sem permissão explícita
+  if (!opts.onlyText) {
+    const isHome = p.id === 'home';
+    const chkMedia = document.getElementById('chk-allow-media-change');
+    const allowMedia = !isHome || (chkMedia && chkMedia.checked);
+
+    if (allowMedia) {
+      const hSrc = document.getElementById('page-hero-img-src');
+      if (hSrc) {
+        if (!p.hero) p.hero = {};
+        if (!p.hero.imagem) p.hero.imagem = { src: '', alt: p.nome };
+        let val = hSrc.value.trim();
+        if (val.includes('/reviews/')) {
+          val = '/assets/hero-dfaria-luxo.jpg';
+        }
+        p.hero.imagem.src = val;
+      }
+    } else if (isHome) {
+      // Garantir que a Home preserva o vídeo cinematográfico Fasano
+      if (!p.hero) p.hero = {};
+      p.hero.video = {
+        src: '/assets/dfaria-hero-cinematic.mp4',
+        poster: '/assets/hero-cinematic-poster.jpg'
+      };
+      if (!p.hero.imagem) {
+        p.hero.imagem = { src: '/assets/hero-cinematic-poster.jpg', alt: "D'Faria Gastronomia" };
+      }
     }
-    p.hero.imagem.src = val;
   }
 
   const mTitle = document.getElementById('page-meta-title');

@@ -3067,8 +3067,9 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
 
   async function sincronizarPagina() {
     const rawPath = window.location.pathname.replace(/\/$/, '') || '/';
-    const pageId = routeMap[rawPath] || routeMap[window.location.pathname];
-    if (!pageId || pageId === 'home' || rawPath === '/' || rawPath === '/index.html' || rawPath === '') { console.log('Home page: skipping dynamic sync'); return; }
+    const isHome = rawPath === '/' || rawPath === '/index.html' || rawPath === '';
+    const pageId = isHome ? 'home' : (routeMap[rawPath] || routeMap[window.location.pathname]);
+    if (!pageId) return;
 
     try {
       let pageData = null;
@@ -3100,12 +3101,7 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
 
       if (!pageData) return;
 
-      // Preservar Hero cinematografica oficial da Home: nunca sobrescrever com rascunhos ou erros tipograficos
-      if (pageId === 'home' && pageData.hero) {
-        delete pageData.hero;
-      }
-
-      // Aplicar Meta Title e Description
+      // Meta Title e Description
       if (pageData.meta_title && document.title !== pageData.meta_title) {
         document.title = pageData.meta_title;
       }
@@ -3114,86 +3110,39 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
         if (metaDesc) metaDesc.setAttribute('content', pageData.meta_description);
       }
 
-      // Aplicar Hero (H1, Subtítulo e Foto Imponente)
-      if (false && pageData.hero) {
-        // H1 com higienização de digitação
+      // Sincronização Segura da Hero: Altera APENAS textos, preservando o vídeo Fasano 100% no ar
+      if (pageData.hero) {
+        // Título H1
         if (pageData.hero.titulo) {
-          let titLimpo = pageData.hero.titulo.replace(/CHEF/gi, 'CHEF').replace(/CHEF\s+CRISTIANO/gi, 'CHEF CRISTIANO').trim();
-          const h1 = document.querySelector('h1');
+          let titLimpo = pageData.hero.titulo.replace(/CHEFFE/gi, 'CHEF').trim();
+          const h1 = document.querySelector('#hero h1, .df-hero-title, main h1');
           if (h1 && h1.textContent.trim() !== titLimpo) {
             h1.textContent = titLimpo;
           }
         }
 
-        // Subtítulo com higienização de digitação
+        // Subtítulo
         if (pageData.hero.subtitulo) {
-          let subLimpo = pageData.hero.subtitulo.replace(/VOCÊ/gi, 'VOCÊ').trim();
-          const sub = document.querySelector('.df-hero-subtitle, h1 + p, main p, .df-hero-sub');
+          let subLimpo = pageData.hero.subtitulo.replace(/VOCÊVOCÊ/gi, 'VOCÊ').trim();
+          const sub = document.querySelector('#hero p, .df-hero-sub, .df-hero-subtitle');
           if (sub && sub.textContent.trim() !== subLimpo) {
             sub.textContent = subLimpo;
           }
         }
 
-        // Imagem da Hero com proteção e fallback imponente
-        if (pageData.hero.imagem && pageData.hero.imagem.src) {
-          let heroSrc = pageData.hero.imagem.src;
-          // Guard: nunca permitir avatar de avaliação do Google como hero
-          if (heroSrc.includes('/reviews/')) {
-            heroSrc = '/assets/hero-dfaria-luxo.jpg';
-          }
-          const heroImg = document.querySelector('.hero-cinematic-bg, main img, .df-hero img');
-          if (heroImg && heroImg.src !== heroSrc && !heroImg.src.endsWith(heroSrc)) {
-            heroImg.src = heroSrc;
-            if (pageData.hero.imagem.alt && !pageData.hero.imagem.alt.includes('Caroline')) {
-              heroImg.alt = pageData.hero.imagem.alt;
-            } else {
-              heroImg.alt = "Banquete de alta gastronomia e buffet para eventos — D’Faria Gastronomia";
-            }
+        // Para páginas secundárias (não home), atualiza a imagem de capa se especificada
+        if (!isHome && pageData.hero.imagem && pageData.hero.imagem.src) {
+          const img = document.querySelector('#hero img, .df-opening-photo, main section:first-child img');
+          if (img && img.getAttribute('src') !== pageData.hero.imagem.src) {
+            img.setAttribute('src', pageData.hero.imagem.src);
           }
         }
       }
-
-      // Aplicar Seções
-      if (Array.isArray(pageData.secoes) && pageData.secoes.length > 0) {
-        const h2List = Array.from(document.querySelectorAll('h2')).filter(h => {
-          const t = h.textContent.toLowerCase();
-          return !t.includes('solicite seu orçamento') && !t.includes('por perto');
-        });
-
-        pageData.secoes.forEach((sec, idx) => {
-          if (h2List[idx] && sec.titulo) {
-            if (h2List[idx].textContent.trim() !== sec.titulo.trim()) {
-              h2List[idx].textContent = sec.titulo;
-            }
-            if (sec.texto) {
-              const nextP = h2List[idx].parentElement ? h2List[idx].parentElement.querySelector('p') : null;
-              if (nextP && nextP.textContent.trim() !== sec.texto.trim()) {
-                nextP.textContent = sec.texto;
-              }
-            }
-          }
-        });
-      }
-
-      // Aplicar Contato se houver
-      if (pageData.dados_extras && pageData.dados_extras.contato) {
-        const c = pageData.dados_extras.contato;
-        if (c.whatsapp_numero) {
-          document.querySelectorAll('a[href*="wa.me"]').forEach(a => {
-            a.href = 'https://wa.me/' + c.whatsapp_numero + '?text=' + encodeURIComponent('Olá! Gostaria de um orçamento para meu evento com o D’Faria.');
-          });
-        }
-        if (c.telefone_display) {
-          document.querySelectorAll('a[href^="tel:"]').forEach(a => {
-            if (c.telefone_numero) a.href = 'tel:' + c.telefone_numero;
-            a.textContent = c.telefone_display;
-          });
-        }
-      }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Erro ao sincronizar página:', e);
+    }
   }
 
-  // Motor Cinematográfico da Hero em Vídeo (Skill dfaria-hero-cinematografica-video)
   function initHeroVideoCinematic() {
     const video = document.getElementById('hero-cinema-video');
     const poster = document.getElementById('hero-cinema-poster');
