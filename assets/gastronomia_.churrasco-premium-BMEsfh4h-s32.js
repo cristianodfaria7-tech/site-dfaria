@@ -1,0 +1,1 @@
+import{n as e,t}from"./index-DfSeo32.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/gastronomia/churrasco-premium`})}export{r as component};
