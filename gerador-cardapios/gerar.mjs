@@ -57,7 +57,7 @@ function pagina({ title, description, url, foto, schemas, main }) {
     `<meta property="og:title" content="${t}"/><meta property="og:description" content="${d}"/><meta property="og:type" content="website"/><meta property="og:url" content="${esc(url)}"/>` +
     `<meta property="og:site_name" content="D&#x27;Faria Gastronomia e Eventos"/><meta property="og:locale" content="pt_BR"/><meta property="og:image" content="${SITE}/og-dfaria.jpg"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/>` +
     `<meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="${t}"/><meta name="twitter:description" content="${d}"/><meta name="twitter:image" content="${SITE}/og-dfaria.jpg"/>` +
-    `<link rel="icon" href="/favicon.ico" type="image/x-icon"/><link rel="canonical" href="${esc(url)}"/>` +
+    `<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2"/><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2"/><link rel="icon" href="/favicon.ico?v=2" type="image/x-icon"/><link rel="canonical" href="${esc(url)}"/>` +
     schemas.map(ld).join('') +
     '</head>' + molde('topo.html') + main + '</main>' + molde('rodape.html') +
     `<!--/$--><script src="/assets/${js[0]}" defer></script></body></html>`;
