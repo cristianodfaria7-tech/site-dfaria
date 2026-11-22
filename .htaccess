@@ -59,8 +59,11 @@ Header set Cache-Control "public, max-age=31536000, immutable"
 Header set X-Content-Type-Options "nosniff"
 </FilesMatch>
 
-<FilesMatch "\.(webp|jpe?g|png|gif|svg|ico|woff2?|css|js)$">
+<FilesMatch "\.(webp|jpe?g|png|gif|svg|ico|woff2?|css)$">
 Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+<FilesMatch "\.js$">
+Header set Cache-Control "public, max-age=0, must-revalidate"
 </FilesMatch>
 <FilesMatch "\.html?$">
 Header set Cache-Control "public, max-age=0, must-revalidate"

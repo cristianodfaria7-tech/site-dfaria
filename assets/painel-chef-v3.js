@@ -3095,10 +3095,10 @@ const api = {
                   neg.hero.imagem.alt = 'Banquete de alta gastronomia e buffet para eventos — D’Faria Gastronomia';
                 }
                 if (neg.hero && neg.hero.titulo) {
-                  neg.hero.titulo = neg.hero.titulo.replace(/CHEFFE/gi, 'CHEF').trim();
+                  neg.hero.titulo = neg.hero.titulo.replace(/CHEF/gi, 'CHEF').trim();
                 }
                 if (neg.hero && neg.hero.subtitulo) {
-                  neg.hero.subtitulo = neg.hero.subtitulo.replace(/VOCÊVOCÊ/gi, 'VOCÊ').trim();
+                  neg.hero.subtitulo = neg.hero.subtitulo.replace(/VOCÊ/gi, 'VOCÊ').trim();
                 }
                 mapa[pid] = { ...mapa[pid], ...neg };
               }
