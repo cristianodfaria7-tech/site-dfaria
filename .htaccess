@@ -28,17 +28,45 @@ RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.+)$ $1.html [L]
 </IfModule>
 
+# Compressão GZIP (HTML, CSS, JS, JSON, SVG, XML)
 <IfModule mod_deflate.c>
 AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml text/xml text/plain
 </IfModule>
 
+# Cache longo para imagens, vídeos, fontes, CSS e JS
 <IfModule mod_expires.c>
 ExpiresActive On
 ExpiresByType text/html "access plus 0 seconds"
 ExpiresByType image/webp "access plus 1 year"
 ExpiresByType image/jpeg "access plus 1 year"
 ExpiresByType image/png "access plus 1 year"
+ExpiresByType image/gif "access plus 1 year"
+ExpiresByType image/svg+xml "access plus 1 year"
+ExpiresByType image/x-icon "access plus 1 year"
 ExpiresByType video/mp4 "access plus 1 year"
+ExpiresByType font/woff2 "access plus 1 year"
 ExpiresByType text/css "access plus 1 year"
 ExpiresByType application/javascript "access plus 1 year"
 </IfModule>
+
+# Cache-Control: arquivos versionados e mídia ficam imutáveis por 1 ano;
+# HTML sempre revalida para receber atualizações.
+<IfModule mod_headers.c>
+<FilesMatch "\.(webp|jpe?g|png|gif|svg|ico|woff2?|mp4|webm|css|js)$">
+Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+<FilesMatch "\.html?$">
+Header set Cache-Control "public, max-age=0, must-revalidate"
+</FilesMatch>
+</IfModule>
+
+# Proteção de arquivos sensíveis (robots.txt e sitemap.xml continuam públicos)
+<FilesMatch "(^\.|\.(log|sh|py|sql|bak)$)">
+<IfModule mod_authz_core.c>
+Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+Order allow,deny
+Deny from all
+</IfModule>
+</FilesMatch>
