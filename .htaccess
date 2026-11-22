@@ -52,7 +52,14 @@ ExpiresByType application/javascript "access plus 1 year"
 # Cache-Control: arquivos versionados e mídia ficam imutáveis por 1 ano;
 # HTML sempre revalida para receber atualizações.
 <IfModule mod_headers.c>
-<FilesMatch "\.(webp|jpe?g|png|gif|svg|ico|woff2?|mp4|webm|css|js)$">
+# Streaming progressivo HTTP 206 para Vídeos da Hero
+<FilesMatch "\.(mp4|webm|m4v)$">
+Header set Accept-Ranges bytes
+Header set Cache-Control "public, max-age=31536000, immutable"
+Header set X-Content-Type-Options "nosniff"
+</FilesMatch>
+
+<FilesMatch "\.(webp|jpe?g|png|gif|svg|ico|woff2?|css|js)$">
 Header set Cache-Control "public, max-age=31536000, immutable"
 </FilesMatch>
 <FilesMatch "\.html?$">

@@ -3557,6 +3557,28 @@ function renderPageTabBanner(p) {
         <textarea id="page-hero-subtitle" rows="2" class="w-full py-2 px-3 rounded-xl border border-stone-300 text-xs text-stone-700 focus:ring-2 focus:ring-dfgreen outline-none" placeholder="Frase de apresentação no início da página">${h.subtitulo || ''}</textarea>
       </div>
 
+      <!-- Status Hero Cinematográfica Fasano -->
+      ${p.id === 'home' ? `
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-dfgreen/10 via-dfgold/15 to-transparent border border-dfgold/30 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-dfgreen text-dfgold flex items-center justify-center font-bold shadow-sm">
+              <i data-lucide="video" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-dfgreen flex items-center gap-1.5">
+                <span>Hero Cinematográfica em Vídeo Full HD (Padrão Fasano)</span>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-dfgreen text-white">ATIVO NO AR</span>
+              </p>
+              <p class="text-[11px] text-stone-600">Vídeo real do buffet em loop contínuo com carregamento no byte zero e iluminação cênica sem véu escuro.</p>
+            </div>
+          </div>
+          <a href="/" target="_blank" class="py-1.5 px-3 rounded-xl bg-dfgreen text-white text-xs font-bold hover:bg-dfgreendeep transition-all shadow-sm flex items-center gap-1 shrink-0">
+            <span>Assistir no Site</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5 text-dfgold"></i>
+          </a>
+        </div>
+      ` : ''}
+
       <!-- Foto do Banner Hero -->
       <div class="p-5 rounded-2xl bg-dfsand/60 border border-stone-200 space-y-3">
         <label class="block text-xs font-bold text-dfgreen">Imagem do Banner Principal:</label>

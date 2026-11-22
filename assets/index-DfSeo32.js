@@ -3204,10 +3204,91 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
     } catch (e) {}
   }
 
+  // Motor Cinematográfico da Hero em Vídeo (Skill dfaria-hero-cinematografica-video)
+  function initHeroVideoCinematic() {
+    const video = document.getElementById('hero-cinema-video');
+    const poster = document.getElementById('hero-cinema-poster');
+    const btnToggle = document.getElementById('btn-toggle-video');
+
+    if (!video) return;
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.pause();
+      return;
+    }
+
+    function hidePoster() {
+      if (poster) {
+        poster.style.opacity = '0';
+        poster.style.pointerEvents = 'none';
+      }
+    }
+
+    video.addEventListener('playing', hidePoster, { once: true });
+    video.addEventListener('timeupdate', function () {
+      if (video.currentTime > 0.1 && poster && poster.style.opacity !== '0') {
+        hidePoster();
+      }
+    });
+
+    const p = video.play();
+    if (p !== undefined) {
+      p.catch(function () {
+        if (poster) poster.style.opacity = '1';
+        if (btnToggle) {
+          const pi = btnToggle.querySelector('.icon-pause');
+          const pli = btnToggle.querySelector('.icon-play');
+          if (pi) pi.classList.add('hidden');
+          if (pli) pli.classList.remove('hidden');
+        }
+      });
+    }
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) {
+            if (!video.paused) video.pause();
+          } else {
+            if (video.paused && !video.hasAttribute('data-manual-pause')) {
+              video.play().catch(function () {});
+            }
+          }
+        });
+      }, { threshold: 0.1 });
+      io.observe(video);
+    }
+
+    if (btnToggle && !btnToggle.hasAttribute('data-bound')) {
+      btnToggle.setAttribute('data-bound', 'true');
+      btnToggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const pi = btnToggle.querySelector('.icon-pause');
+        const pli = btnToggle.querySelector('.icon-play');
+        if (video.paused) {
+          video.removeAttribute('data-manual-pause');
+          video.play();
+          if (pi) pi.classList.remove('hidden');
+          if (pli) pli.classList.add('hidden');
+        } else {
+          video.setAttribute('data-manual-pause', 'true');
+          video.pause();
+          if (pi) pi.classList.add('hidden');
+          if (pli) pli.classList.remove('hidden');
+        }
+      });
+    }
+  }
+
   if (typeof window !== 'undefined') {
+    initHeroVideoCinematic();
+    setTimeout(initHeroVideoCinematic, 150);
     setTimeout(sincronizarPagina, 80);
     setTimeout(sincronizarPagina, 500);
-    window.addEventListener('popstate', () => setTimeout(sincronizarPagina, 120));
+    window.addEventListener('popstate', () => {
+      setTimeout(sincronizarPagina, 120);
+      setTimeout(initHeroVideoCinematic, 150);
+    });
   }
 })();
 
