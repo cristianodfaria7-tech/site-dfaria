@@ -1,1 +1,0 @@
-import{n as e,t}from"./index-DfSeo27.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/cardapios/debutante-ilha-de-frios-e-massa`})}export{r as component};

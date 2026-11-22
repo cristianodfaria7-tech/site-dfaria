@@ -1,1 +1,0 @@
-import{n as e,t}from"./index-DfSeo27.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/cardapios/almoco-especial-de-carnes-e-peixe`})}export{r as component};

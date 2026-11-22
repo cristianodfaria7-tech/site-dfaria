@@ -1,0 +1,1 @@
+import{n as e,t}from"./index-DfSeo28.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/gastronomia/estacoes-gastronomicas`})}export{r as component};
