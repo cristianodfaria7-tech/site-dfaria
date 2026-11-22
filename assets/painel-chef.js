@@ -7,6 +7,7 @@ const SUPABASE_KEY = 'sb_publishable_yeda5BcY2QZyBoVMi4r_0Q_Hbxc5Ex2';
 // Estado global do painel
 const state = {
   user: null,
+  loginEmail: '',
   token: localStorage.getItem('df_chef_token') || null,
   refreshToken: localStorage.getItem('df_chef_refresh') || null,
   categories: [],
@@ -25,11 +26,9 @@ const api = {
   headers() {
     const h = {
       'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${state.token || SUPABASE_KEY}`,
       'Content-Type': 'application/json'
     };
-    if (state.token) {
-      h['Authorization'] = `Bearer ${state.token}`;
-    }
     return h;
   },
 
@@ -40,7 +39,10 @@ const api = {
       body: JSON.stringify({ email, password })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error_description || data.msg || 'Falha no login');
+    if (!res.ok) {
+      const msg = data.error_description || data.msg || data.message || 'Falha no login';
+      throw new Error(msg);
+    }
     return data;
   },
 
@@ -202,14 +204,14 @@ function renderLogin() {
 
         <form id="login-form" class="space-y-4">
           <div>
-            <label class="block text-xs font-bold text-stone-700 mb-1.5">E-mail do Chef:</label>
-            <input type="email" id="login-email" required placeholder="contato@dfariagastronomia.com.br"
+            <label class="block text-xs font-bold text-stone-700 mb-1.5" for="login-email">E-mail do Chef:</label>
+            <input type="email" id="login-email" name="email" required autocomplete="username" value="${state.loginEmail || ''}" placeholder="contato@dfariagastronomia.com.br"
               class="w-full py-2.5 px-3.5 rounded-xl border border-stone-200 text-sm font-medium focus:ring-2 focus:ring-dfgreen outline-none" />
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-stone-700 mb-1.5">Senha de Acesso:</label>
-            <input type="password" id="login-password" required placeholder="••••••••"
+            <label class="block text-xs font-bold text-stone-700 mb-1.5" for="login-password">Senha de Acesso:</label>
+            <input type="password" id="login-password" name="password" required autocomplete="current-password" placeholder="••••••••"
               class="w-full py-2.5 px-3.5 rounded-xl border border-stone-200 text-sm font-medium focus:ring-2 focus:ring-dfgreen outline-none" />
           </div>
 
@@ -483,11 +485,15 @@ function attachLoginEvents() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
+    const emailEl = document.getElementById('login-email');
+    const passwordEl = document.getElementById('login-password');
+    const email = (emailEl ? emailEl.value : '').trim();
+    const password = passwordEl ? passwordEl.value : '';
+
+    state.loginEmail = email;
 
     if (!email || !password) {
-      state.feedback = { type: 'error', text: 'Por favor, preencha o e-mail e a senha.' };
+      state.feedback = { type: 'error', text: 'Por favor, preencha o e-mail e a senha de acesso.' };
       render();
       return;
     }
@@ -495,6 +501,7 @@ function attachLoginEvents() {
     const btnSubmit = form.querySelector('button[type="submit"]');
     if (btnSubmit) {
       btnSubmit.disabled = true;
+      btnSubmit.classList.add('opacity-80', 'cursor-not-allowed');
       btnSubmit.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Entrando...';
       if (window.lucide) window.lucide.createIcons();
     }
@@ -506,10 +513,17 @@ function attachLoginEvents() {
       state.user = auth.user;
       localStorage.setItem('df_chef_token', state.token);
       localStorage.setItem('df_chef_refresh', state.refreshToken);
+      state.feedback = null;
       await loadInitialData();
       render();
     } catch (err) {
-      state.feedback = { type: 'error', text: err.message };
+      let msg = err.message || 'Falha no login';
+      if (msg === 'Invalid login credentials') {
+        msg = 'E-mail ou senha incorretos. Verifique suas credenciais de acesso.';
+      } else if (msg === 'Email not confirmed') {
+        msg = 'E-mail cadastrado, mas pendente de confirmação no Supabase.';
+      }
+      state.feedback = { type: 'error', text: msg };
       render();
     }
   });
