@@ -7,3 +7,6 @@ dfaria-site-hostgator-v2-corrigido (1)/
 Thumbs.db
 desktop.ini
 
+
+node_modules/
+.ferramentas/
