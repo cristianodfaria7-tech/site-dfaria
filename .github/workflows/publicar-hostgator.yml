@@ -77,3 +77,4 @@ jobs:
             assets/dfaria-hero-fullhd.mp4
             cardapios.html.backup
             api/**
+            gerador-cardapios/**
