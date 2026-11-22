@@ -492,9 +492,12 @@ function attachLoginEvents() {
       return;
     }
 
-    state.loading = true;
-    state.feedback = null;
-    render();
+    const btnSubmit = form.querySelector('button[type="submit"]');
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Entrando...';
+      if (window.lucide) window.lucide.createIcons();
+    }
 
     try {
       const auth = await api.login(email, password);
@@ -504,10 +507,9 @@ function attachLoginEvents() {
       localStorage.setItem('df_chef_token', state.token);
       localStorage.setItem('df_chef_refresh', state.refreshToken);
       await loadInitialData();
+      render();
     } catch (err) {
       state.feedback = { type: 'error', text: err.message };
-    } finally {
-      state.loading = false;
       render();
     }
   });
