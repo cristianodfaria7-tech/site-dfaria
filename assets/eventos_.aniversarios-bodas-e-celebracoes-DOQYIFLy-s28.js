@@ -1,1 +1,0 @@
-import{n as e,t}from"./index-DfSeo28.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/eventos/aniversarios-bodas-e-celebracoes`})}export{r as component};
