@@ -3236,6 +3236,8 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
       }
     });
 
+    video.muted = true;
+    video.defaultMuted = true;
     const p = video.play();
     if (p !== undefined) {
       p.catch(function () {
