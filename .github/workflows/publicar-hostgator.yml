@@ -1,0 +1,79 @@
+# Publica o site na HostGator sempre que algo entra na branch main
+# (merge de PR ou push), e também pelo botão "Run workflow" na aba Actions.
+#
+# Segredos necessários (GitHub > Settings > Secrets and variables > Actions):
+#   FTP_SERVIDOR   ex.: ftp.dfariagastronomia.com.br
+#   FTP_USUARIO    usuário de FTP da HostGator
+#   FTP_SENHA      senha desse usuário
+#   FTP_PASTA      (opcional) pasta do site no servidor. Padrão: public_html/
+#                  Se o usuário de FTP já abre direto dentro de public_html, use ./
+#
+# Só envia os arquivos que mudaram. Nunca apaga arquivos do servidor que não
+# foram enviados por esta automação (ex.: verificação do Google, e-mails, configs).
+# A pasta api/ NÃO é enviada: o servidor já tem o enviar-orcamento.php
+# funcionando com a configuração secreta dele. Para atualizar, suba pelo cPanel.
+
+name: Publicar na HostGator
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: publicar-hostgator
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Conferir se os segredos de FTP existem
+        env:
+          FTP_SERVIDOR: ${{ secrets.FTP_SERVIDOR }}
+          FTP_USUARIO: ${{ secrets.FTP_USUARIO }}
+          FTP_SENHA: ${{ secrets.FTP_SENHA }}
+        run: |
+          if [ -z "$FTP_SERVIDOR" ] || [ -z "$FTP_USUARIO" ] || [ -z "$FTP_SENHA" ]; then
+            echo "::error::Faltam os segredos FTP_SERVIDOR, FTP_USUARIO ou FTP_SENHA em Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Conferir arquivos essenciais antes de publicar
+        run: |
+          for f in index.html .htaccess sitemap.xml robots.txt 404.html; do
+            test -f "$f" || { echo "::error::Arquivo essencial ausente: $f"; exit 1; }
+          done
+          for js in $(grep -oh 'assets/index-[A-Za-z0-9_-]*\.js' index.html | sort -u); do
+            test -f "$js" || { echo "::error::index.html aponta para $js, que não existe"; exit 1; }
+          done
+
+      - name: Enviar para a HostGator por FTP seguro
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVIDOR }}
+          username: ${{ secrets.FTP_USUARIO }}
+          password: ${{ secrets.FTP_SENHA }}
+          protocol: ftps
+          security: loose
+          server-dir: ${{ secrets.FTP_PASTA || 'public_html/' }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            .agents/**
+            node_modules/**
+            **/*.md
+            **/*.mjs
+            **/*.backup
+            pages-list.json
+            hero-template.html
+            experiencia-3d.html
+            experiencia-luxe.html
+            assets/dfaria-hero-fullhd.mp4
+            cardapios.html.backup
+            api/**
