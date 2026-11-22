@@ -16,11 +16,11 @@ const DEFAULT_PAGES = {
     "meta_title": "Buffet para Casamentos e Eventos Corporativos | D&#x27;Faria",
     "meta_description": "Buffet e gastronomia para casamentos, eventos corporativos, formaturas e celebrações em Cesário Lange e região. Desde 2016, com mais de 38 anos de experiência do chef Cristiano De Faria.",
     "hero": {
-      "titulo": "EU ASSUMO CADA DETALHE.",
-      "subtitulo": "VOCÊ VIVE O MELHOR DO SEU EVENTO.",
+      "titulo": "O CHEF CRISTIANO ASSUME CADA DETALHE.",
+      "subtitulo": "VOCÊ CELEBRA, CONFRATERNIZA E APROVEITA CADA MOMENTO. VIVE O MELHOR DO SEU EVENTO.",
       "imagem": {
-        "src": "/reviews/caroline-cancio-de-oliveira.png",
-        "alt": "Foto de perfil de Caroline Câncio de Oliveira no Google"
+        "src": "/assets/hero-dfaria-luxo.jpg",
+        "alt": "Banquete de alta gastronomia e buffet para eventos — D’Faria Gastronomia"
       }
     },
     "secoes": [
@@ -2510,8 +2510,8 @@ const DEFAULT_PAGES = {
       "titulo": "O que nossos clientes dizem",
       "subtitulo": "Publicamos apenas avaliações reais de clientes, vindas do perfil oficial do D’Faria no Google.",
       "imagem": {
-        "src": "/reviews/caroline-cancio-de-oliveira.png",
-        "alt": "Foto de perfil de Caroline Câncio de Oliveira no Google"
+        "src": "/__l5e/assets-v1/e5d011ca-5a5d-4743-8fa0-987e11261d08/salao-mesas-redondas-recepcao-dfaria.webp",
+        "alt": "Salão nobre montado para recepção do D’Faria"
       }
     },
     "secoes": [
@@ -3089,7 +3089,18 @@ const api = {
             for (const r of pageRows) {
               const pid = r.id.replace(/^page_/, '');
               if (mapa[pid]) {
-                mapa[pid] = { ...mapa[pid], ...r.negocio };
+                const neg = { ...r.negocio };
+                if (neg.hero && neg.hero.imagem && neg.hero.imagem.src && neg.hero.imagem.src.includes('/reviews/')) {
+                  neg.hero.imagem.src = '/assets/hero-dfaria-luxo.jpg';
+                  neg.hero.imagem.alt = 'Banquete de alta gastronomia e buffet para eventos — D’Faria Gastronomia';
+                }
+                if (neg.hero && neg.hero.titulo) {
+                  neg.hero.titulo = neg.hero.titulo.replace(/CHEFFE/gi, 'CHEF').trim();
+                }
+                if (neg.hero && neg.hero.subtitulo) {
+                  neg.hero.subtitulo = neg.hero.subtitulo.replace(/VOCÊVOCÊ/gi, 'VOCÊ').trim();
+                }
+                mapa[pid] = { ...mapa[pid], ...neg };
               }
             }
             return mapa;
@@ -3564,6 +3575,58 @@ function renderPageTabBanner(p) {
             </div>
           </div>
         </div>
+
+        <!-- Capas Imponentes Recomendadas em 1 Clique -->
+        <div class="pt-3 border-t border-stone-200/80">
+          <label class="block text-[11px] font-bold text-dfgreen mb-2 flex items-center gap-1.5">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-dfgold"></i>
+            <span>Capas Imponentes Disponíveis (Clique para aplicar imediatamente):</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/assets/hero-dfaria-luxo.jpg" data-alt="Banquete de alta gastronomia e buffet para eventos — D’Faria Gastronomia">
+              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
+                <img src="/assets/hero-dfaria-luxo.jpg" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+              </div>
+              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🌟 Banquete Sunset Luxo (16:9)</p>
+              <p class="text-[9px] text-stone-400">Cinematográfico / Noturno</p>
+            </button>
+            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/1472106d-603b-4c1a-9f89-7b8fdf1f18ef/hero-mesa-piscina.webp" data-alt="Mesa posta de alta gastronomia junto à piscina — D’Faria">
+              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
+                <img src="/__l5e/assets-v1/1472106d-603b-4c1a-9f89-7b8fdf1f18ef/hero-mesa-piscina.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+              </div>
+              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🏊 Mesa Piscina (Original)</p>
+              <p class="text-[9px] text-stone-400">Ar Livre / Clássico</p>
+            </button>
+            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/5a856cc3-8d4b-4c1c-9238-6c6e2cac0104/churrasco-fogo-de-chao-evento-dfaria.webp" data-alt="Churrasco Fogo de Chão D’Faria">
+              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
+                <img src="/__l5e/assets-v1/5a856cc3-8d4b-4c1c-9238-6c6e2cac0104/churrasco-fogo-de-chao-evento-dfaria.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+              </div>
+              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🥩 Fogo de Chão & Brasa</p>
+              <p class="text-[9px] text-stone-400">Carnes Nobres & Parrilla</p>
+            </button>
+            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/d9e32d7c-dd7e-46de-b79b-739f373ae6b5/ilha-frios-mesa-madeira-jardim.webp" data-alt="Ilha de Frios no Jardim D’Faria">
+              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
+                <img src="/__l5e/assets-v1/d9e32d7c-dd7e-46de-b79b-739f373ae6b5/ilha-frios-mesa-madeira-jardim.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+              </div>
+              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🧀 Ilha Gourmet de Frios</p>
+              <p class="text-[9px] text-stone-400">Mesa Rústica de Jardim</p>
+            </button>
+            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/e5d011ca-5a5d-4743-8fa0-987e11261d08/salao-mesas-redondas-recepcao-dfaria.webp" data-alt="Salão Nobre para Casamentos D’Faria">
+              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
+                <img src="/__l5e/assets-v1/e5d011ca-5a5d-4743-8fa0-987e11261d08/salao-mesas-redondas-recepcao-dfaria.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+              </div>
+              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🏛️ Salão Recepção Nobre</p>
+              <p class="text-[9px] text-stone-400">Casamentos & Gala</p>
+            </button>
+            <button type="button" class="btn-preset-hero p-2 rounded-xl border border-stone-200 bg-white hover:border-dfgold hover:shadow-sm text-left transition-all group" data-src="/__l5e/assets-v1/455b55ff-e44a-494e-8d42-9ec932b0f072/mesas-montadas-evento-ar-livre-dfaria.webp" data-alt="Mesas montadas em evento ao ar livre D’Faria">
+              <div class="h-16 rounded-lg overflow-hidden mb-1.5 bg-stone-100">
+                <img src="/__l5e/assets-v1/455b55ff-e44a-494e-8d42-9ec932b0f072/mesas-montadas-evento-ar-livre-dfaria.webp" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+              </div>
+              <p class="text-[11px] font-bold text-stone-800 line-clamp-1">🌿 Mesas ao Ar Livre</p>
+              <p class="text-[9px] text-stone-400">Jardim & Celebração</p>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -4032,6 +4095,22 @@ function attachDashboardEvents() {
     });
   }
 
+  // Botões de Presets de Capa Imponente
+  document.querySelectorAll('.btn-preset-hero').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const src = btn.getAttribute('data-src');
+      const alt = btn.getAttribute('data-alt');
+      const input = document.getElementById('page-hero-img-src');
+      const prev = document.getElementById('page-preview-hero-img');
+      if (input) input.value = src;
+      if (prev) prev.src = src;
+      if (state.selectedPage) {
+        if (!state.selectedPage.hero) state.selectedPage.hero = {};
+        state.selectedPage.hero.imagem = { src, alt };
+      }
+    });
+  });
+
   // Upload Foto Hero da Página
   const pageFileHero = document.getElementById('page-file-hero');
   if (pageFileHero && state.selectedPage) {
@@ -4260,7 +4339,11 @@ function syncPageFormDataToState() {
   if (hSrc) {
     if (!p.hero) p.hero = {};
     if (!p.hero.imagem) p.hero.imagem = { src: '', alt: p.nome };
-    p.hero.imagem.src = hSrc.value;
+    let val = hSrc.value.trim();
+    if (val.includes('/reviews/')) {
+      val = '/assets/hero-dfaria-luxo.jpg';
+    }
+    p.hero.imagem.src = val;
   }
 
   const mTitle = document.getElementById('page-meta-title');

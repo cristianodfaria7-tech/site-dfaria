@@ -3125,25 +3125,41 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
         if (metaDesc) metaDesc.setAttribute('content', pageData.meta_description);
       }
 
-      // Aplicar Hero (H1 e Subtítulo)
+      // Aplicar Hero (H1, Subtítulo e Foto Imponente)
       if (pageData.hero) {
-        const h1 = document.querySelector('h1');
-        if (h1 && pageData.hero.titulo && h1.textContent.trim() !== pageData.hero.titulo.trim()) {
-          h1.textContent = pageData.hero.titulo;
-        }
-
-        if (pageData.hero.subtitulo) {
-          const sub = document.querySelector('.df-hero-subtitle, h1 + p, main p');
-          if (sub && sub.textContent.trim() !== pageData.hero.subtitulo.trim()) {
-            sub.textContent = pageData.hero.subtitulo;
+        // H1 com higienização de digitação
+        if (pageData.hero.titulo) {
+          let titLimpo = pageData.hero.titulo.replace(/CHEFFE/gi, 'CHEF').trim();
+          const h1 = document.querySelector('h1');
+          if (h1 && h1.textContent.trim() !== titLimpo) {
+            h1.textContent = titLimpo;
           }
         }
 
+        // Subtítulo com higienização de digitação
+        if (pageData.hero.subtitulo) {
+          let subLimpo = pageData.hero.subtitulo.replace(/VOCÊVOCÊ/gi, 'VOCÊ').trim();
+          const sub = document.querySelector('.df-hero-subtitle, h1 + p, main p, .df-hero-sub');
+          if (sub && sub.textContent.trim() !== subLimpo) {
+            sub.textContent = subLimpo;
+          }
+        }
+
+        // Imagem da Hero com proteção e fallback imponente
         if (pageData.hero.imagem && pageData.hero.imagem.src) {
-          const heroImg = document.querySelector('main img, .df-hero img');
-          if (heroImg && heroImg.src !== pageData.hero.imagem.src) {
-            heroImg.src = pageData.hero.imagem.src;
-            if (pageData.hero.imagem.alt) heroImg.alt = pageData.hero.imagem.alt;
+          let heroSrc = pageData.hero.imagem.src;
+          // Guard: nunca permitir avatar de avaliação do Google como hero
+          if (heroSrc.includes('/reviews/')) {
+            heroSrc = '/assets/hero-dfaria-luxo.jpg';
+          }
+          const heroImg = document.querySelector('.hero-cinematic-bg, main img, .df-hero img');
+          if (heroImg && heroImg.src !== heroSrc && !heroImg.src.endsWith(heroSrc)) {
+            heroImg.src = heroSrc;
+            if (pageData.hero.imagem.alt && !pageData.hero.imagem.alt.includes('Caroline')) {
+              heroImg.alt = pageData.hero.imagem.alt;
+            } else {
+              heroImg.alt = "Banquete de alta gastronomia e buffet para eventos — D’Faria Gastronomia";
+            }
           }
         }
       }
