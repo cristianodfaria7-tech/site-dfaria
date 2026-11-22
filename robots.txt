@@ -1,4 +1,7 @@
 User-agent: *
+Disallow: /painel
+Disallow: /painel.html
 Allow: /
 
 Sitemap: https://dfariagastronomia.com.br/sitemap.xml
+
