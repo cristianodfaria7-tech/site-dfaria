@@ -1,1 +1,1 @@
-import{n as e,t}from"./index-v37.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/depoimentos`})}export{r as component};
+import{n as e,t}from "./index-v38-fasano.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/depoimentos`})}export{r as component};
