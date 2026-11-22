@@ -482,12 +482,19 @@ function attachLoginEvents() {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if (!email || !password) {
+      state.feedback = { type: 'error', text: 'Por favor, preencha o e-mail e a senha.' };
+      render();
+      return;
+    }
+
     state.loading = true;
     state.feedback = null;
     render();
-
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
 
     try {
       const auth = await api.login(email, password);
