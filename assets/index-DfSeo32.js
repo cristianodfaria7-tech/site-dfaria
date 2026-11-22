@@ -3116,6 +3116,11 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
 
       if (!pageData) return;
 
+      // Preservar Hero cinematografica oficial da Home: nunca sobrescrever com rascunhos ou erros tipograficos
+      if (pageId === 'home' && pageData.hero) {
+        delete pageData.hero;
+      }
+
       // Aplicar Meta Title e Description
       if (pageData.meta_title && document.title !== pageData.meta_title) {
         document.title = pageData.meta_title;
