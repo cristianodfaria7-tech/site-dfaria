@@ -1,0 +1,1 @@
+import{n as e,t}from"./index-DfSeo30.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/depoimentos`})}export{r as component};

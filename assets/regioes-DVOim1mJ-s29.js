@@ -1,1 +1,0 @@
-import{n as e,t}from"./index-DfSeo29.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/regioes`})}export{r as component};
