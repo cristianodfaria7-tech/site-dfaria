@@ -2624,44 +2624,28 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
 <svg class="arr-1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
 </svg>
-</button></div><button aria-controls="menu-mobile" aria-expanded="false" aria-label="Abrir menu" class="shrink-0 justify-self-end rounded-full px-4 py-2 text-sm font-medium text-goldlight ring-1 ring-goldlight/50 transition-colors hover:ring-goldlight lg:hidden" type="button">Menu</button></nav></div></header><main id="conteudo"><!--$--><section class="relative isolate flex min-h-[calc(100svh-4rem)] items-center overflow-hidden bg-greendeep text-ivory lg:min-h-[calc(100svh-5rem)]">
-<img alt="Mesa posta com toalha verde, louças, taças e flores em evento ao ar livre junto à piscina, montado pelo D’Faria" class="hero-cinematic-bg absolute inset-0 -z-20 h-full w-full object-cover object-center" decoding="async" fetchpriority="high" height="1448" loading="eager" sizes="100vw" src="/__l5e/assets-v1/1472106d-603b-4c1a-9f89-7b8fdf1f18ef/hero-mesa-piscina.webp" width="1086"/>
-<span aria-hidden="true" class="absolute inset-0 -z-10 bg-gradient-to-t from-greendeep via-greendeep/85 to-greendeep/40 lg:bg-gradient-to-r lg:from-greendeep/[0.95] lg:via-greendeep/75 lg:to-greendeep/30"></span>
-<span aria-hidden="true" class="absolute inset-x-0 bottom-0 -z-10 h-1/4 bg-gradient-to-t from-greendeep to-transparent"></span>
-<div class="relative mx-auto w-full max-w-7xl px-6 py-20 sm:px-8 lg:px-12 lg:py-28">
-<div class="max-w-[48rem]">
-<!-- Headline Principal Mestre -->
-<h1 class="reveal d2 df-hero-title">
-        <span class="df-hero-gold">EU ASSUMO</span><br/>
-        CADA DETALHE.
-</h1>
-<span aria-hidden="true" class="reveal d2 df-hero-rule"></span>
-<p class="reveal d3 df-hero-sub">
-        VOCÊ VIVE O<br/>
-        MELHOR DO SEU<br/>
-        EVENTO.
-</p>
-<p class="reveal d3 df-hero-sign">D’Faria Gastronomia e Eventos</p>
-<!-- CTAs Comerciais -->
-<div class="reveal d4 mt-10 flex flex-wrap items-center gap-4 sm:gap-6">
-<button class="animated-button js-open-orcamento" type="button">
-<svg class="arr-2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-</svg>
-<span class="text">SOLICITAR ORÇAMENTO</span>
-<span class="circle"></span>
-<svg class="arr-1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-</svg>
-</button>
-<a class="df-btn-outline" href="/o-dfaria">
-<span>Conheça o D’Faria</span>
-<span aria-hidden="true">→</span>
+</button></div><button aria-controls="menu-mobile" aria-expanded="false" aria-label="Abrir menu" class="shrink-0 justify-self-end rounded-full px-4 py-2 text-sm font-medium text-goldlight ring-1 ring-goldlight/50 transition-colors hover:ring-goldlight lg:hidden" type="button">Menu</button></nav></div></header><main id="conteudo"><!--$--><section id="hero" class="relative isolate flex min-h-screen h-[100svh] w-full items-center justify-center overflow-hidden">
+<div class="absolute inset-0 -z-20 w-full h-full overflow-hidden">
+  <video id="hero-cinema-video" autoplay muted loop playsinline preload="auto" poster="/assets/hero-cinematic-poster.jpg" class="absolute inset-0 h-full w-full object-cover object-center" width="1920" height="1080">
+    <source src="/assets/dfaria-hero-cinematic.mp4" type="video/mp4" />
+    <img id="hero-cinema-poster" alt="Alta gastronomia e celebração de luxo — D’Faria Gastronomia" class="absolute inset-0 h-full w-full object-cover object-center" decoding="async" fetchpriority="high" height="1080" loading="eager" sizes="100vw" src="/assets/hero-cinematic-poster.jpg" width="1920"/>
+  </video>
+</div>
+<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-transparent to-black/70"></div>
+<div class="relative z-10 flex flex-col items-center justify-center text-center px-4 max-w-4xl mx-auto pt-16 sm:pt-20">
+  <span class="text-[11px] sm:text-xs uppercase tracking-[0.45em] text-white/90 font-light mb-4 drop-shadow-md">Alta Gastronomia · Casamentos &amp; Grandes Eventos</span>
+  <h1 class="text-3xl sm:text-5xl md:text-6xl font-serif font-normal text-white tracking-widest uppercase drop-shadow-lg mb-6">D’Faria Gastronomia</h1>
+  <p class="text-sm sm:text-base md:text-lg text-white/90 font-light max-w-2xl mx-auto leading-relaxed drop-shadow-md mb-8">A excelência em celebrar cada momento com alta precisão gastronômica e serviço impecável.</p>
+  <div class="flex items-center gap-6 sm:gap-8">
+    <a href="/cardapios" class="text-xs uppercase tracking-[0.3em] text-white border-b border-white/50 pb-1 hover:border-gold hover:text-gold transition-all duration-300">Ver Cardápios</a>
+    <span class="text-white/40">·</span>
+    <button class="text-xs uppercase tracking-[0.3em] text-white border-b border-white/50 pb-1 hover:border-gold hover:text-gold transition-all duration-300 js-open-orcamento cursor-pointer">Solicitar Proposta</button>
+  </div>
+</div>
+<a href="#conteudo-principal" aria-label="Rolar para o conteúdo" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center text-white/70 hover:text-white transition-colors duration-300">
+  <span class="text-[9px] uppercase tracking-[0.35em] font-light mb-2">Descubra</span>
+  <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
 </a>
-</div>
-
-</div>
-</div>
 </section><section class="green-texture text-ivory"><div class="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-10 lg:py-24"><div><p class="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-gold"><span class="h-px w-8 bg-gold"></span>D’Faria em movimento</p><h2 class="mt-5 max-w-[22ch] font-display text-3xl leading-tight text-balance lg:text-[2.75rem]">Um pouco do nosso trabalho ao vivo</h2><p class="mt-6 max-w-[48ch] text-base leading-relaxed text-ivory/80 text-pretty">Montagem, atendimento e apresentação: o cuidado que aplicamos em cada evento.</p><div class="mt-8"><button class="animated-button js-open-orcamento" type="button">
 <svg class="arr-2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
@@ -3298,5 +3282,23 @@ Recebemos muitos elogios pela comida e pelo atendimento. Tudo foi servido no tem
     });
   }
 })();
+
+
+  function ensureHeroVideoPlaying() {
+    const v = document.getElementById('hero-cinema-video');
+    if (v) {
+      v.muted = true;
+      v.defaultMuted = true;
+      if (v.paused) {
+        v.play().catch(function() {});
+      }
+    }
+  }
+  if (typeof window !== 'undefined') {
+    [100, 300, 600, 1000, 1800, 2500, 3500, 5000].forEach(function(t) {
+      setTimeout(ensureHeroVideoPlaying, t);
+    });
+    window.addEventListener('load', ensureHeroVideoPlaying);
+  }
 
 export{ic as n,UD as t};
