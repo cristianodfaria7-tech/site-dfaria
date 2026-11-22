@@ -1,0 +1,1 @@
+import{n as e,t}from"./index-DfSeo28.js";var n=e();function r(){return(0,n.jsx)(t,{path:`/cardapios/cafe-da-manha-com-mini-sanduiches`})}export{r as component};
