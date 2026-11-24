@@ -52,6 +52,14 @@ jobs:
             test -f "$js" || { echo "::error::index.html aponta para $js, que não existe"; exit 1; }
           done
 
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: TRAVA - nenhuma URL pode mudar (bloqueia a publicação se mudar)
+        run: node .github/travas/verificar-site.mjs
+
       - name: Enviar para a HostGator por FTP seguro
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -78,3 +86,14 @@ jobs:
             cardapios.html.backup
             api/**
             gerador-cardapios/**
+
+      - name: Conferir no ar - as 53 URLs travadas respondem
+        run: |
+          sleep 10
+          falhas=0
+          for u in $(node -e "console.log(require('./.github/travas/urls-travadas.json').urls.join('\n'))"); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -L "$u?conferir=$GITHUB_RUN_ID")
+            if [ "$code" != "200" ]; then echo "::error::$u respondeu $code"; falhas=$((falhas+1)); fi
+          done
+          if [ "$falhas" -gt 0 ]; then echo "::error::$falhas URL(s) com problema depois de publicar"; exit 1; fi
+          echo "Todas as URLs travadas respondem 200."
