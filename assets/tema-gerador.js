@@ -40,7 +40,7 @@
 
   // Como o site está HOJE (para mostrar no painel e para o "Restaurar padrão")
   var PADRAO = {
-    cores: { titulos: '#ffffff', textos: '#fcfaf5', destaques: '#cfa853', botaoFundo: '#cfa853', botaoTexto: '#061208' },
+    cores: { titulos: '#ffffff', textos: '#fcfaf5', destaques: '#cfa853', botaoFundo: '#cfa853', botaoTexto: '#061208', capaFrase: '#ffffff' },
     fontes: { titulos: 'Outfit', textos: 'Outfit', botoes: 'Outfit' }
   };
   var FUNDO_SITE = '#0a1c0d';
@@ -52,7 +52,9 @@
     titulos: ['h1', 'h2', 'h4', 'h5', 'h6', '.df-hero-title', '.df-page-title', '#hero h1', '.df-client-heading h2', '.df-editorial-layout h2', '.df-editorial-layout h4', '.df-corporate-layout h2'],
     textos: ['p', 'li', 'dd', 'dt', 'blockquote', 'label', 'td', 'th', '.text-stone', '.text-graphite', '.df-hero-sub', '#hero p', '.site-desktop-nav > a', '.site-mobile-nav > a', 'details summary', 'footer a', 'footer span'],
     destaques: ['h3', '.df-page-title-accent', '.df-page-title .df-page-title-accent', 'main a:not(.df-btn-primary):not(.df-btn-outline)', 'figcaption', '.text-gold', '.text-green', '.text-greendeep', '.df-corporate-layout h3', '.df-editorial-layout h3'],
-    botoes: ['.df-btn-primary', '.site-quote-button', '.quote-submit', '.site-mobile-nav > button']
+    botoes: ['.df-btn-primary', '.site-quote-button', '.quote-submit', '.site-mobile-nav > button'],
+    // a frase embaixo do título grande da página inicial ("Você celebra…")
+    capaFrase: ['#hero p', '.df-hero-sub']
   };
 
   function fonte(nome) {
@@ -66,7 +68,7 @@
     t = t || {};
     var c = t.cores || {}, f = t.fontes || {};
     var r = { cores: {}, fontes: {} };
-    ['titulos', 'textos', 'destaques', 'botaoFundo', 'botaoTexto'].forEach(function (k) { r.cores[k] = corValida(c[k]) ? c[k].toLowerCase() : null; });
+    ['titulos', 'textos', 'destaques', 'botaoFundo', 'botaoTexto', 'capaFrase'].forEach(function (k) { r.cores[k] = corValida(c[k]) ? c[k].toLowerCase() : null; });
     ['titulos', 'textos', 'botoes'].forEach(function (k) { r.fontes[k] = fonte(f[k]) ? f[k] : null; });
     return r;
   }
@@ -80,6 +82,8 @@
     }
     if (c.titulos) out.push(lista(SEL.titulos) + '{color:' + c.titulos + '!important}');
     if (c.textos) out.push(lista(SEL.textos) + '{color:' + c.textos + '!important}');
+    // depois de "Textos": a frase da capa vence quando tiver cor própria (sombra forte para ler sobre o vídeo)
+    if (c.capaFrase) out.push(lista(SEL.capaFrase) + '{color:' + c.capaFrase + '!important;text-shadow:0 2px 10px rgba(0,0,0,.75),0 0 2px rgba(0,0,0,.6)!important}');
     if (c.botaoFundo || c.botaoTexto) {
       out.push(lista(SEL.botoes) + '{' + (c.botaoFundo ? 'background:' + c.botaoFundo + '!important;border-color:' + c.botaoFundo + '!important;' : '') + (c.botaoTexto ? 'color:' + c.botaoTexto + '!important;' : '') + '}');
     }

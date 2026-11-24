@@ -158,6 +158,7 @@ export function renderCorpo() {
 
 /* ---------- Aparência ---------- */
 const TIPOS = [
+  { id: 'capa', nome: 'Frase da capa', ajuda: 'Só a frase embaixo do título grande da página inicial (“Você celebra, confraterniza…”). Ganha sombra para ler bem sobre o vídeo.', cor: 'capaFrase', fonte: null, semFonte: 'A fonte desta frase acompanha a fonte dos Textos.', exemplo: 'Você celebra, confraterniza e aproveita cada momento…' },
   { id: 'titulos', nome: 'Títulos', ajuda: 'Os títulos grandes das páginas e das seções.', cor: 'titulos', fonte: 'titulos', exemplo: 'Eventos atendidos pelo D’Faria' },
   { id: 'textos', nome: 'Textos', ajuda: 'Os parágrafos, listas, menu e rodapé.', cor: 'textos', fonte: 'textos', exemplo: 'Cada formato tem um ritmo próprio de serviço.' },
   { id: 'destaques', nome: 'Destaques', ajuda: 'O “dourado”: segunda parte dos títulos, subtítulos, links e detalhes.', cor: 'destaques', fonte: null, exemplo: 'Alta gastronomia' },
@@ -172,7 +173,8 @@ function seletorCor(tipo, chave, rotulo) {
   const atual = valorCor(chave);
   const escolhida = ctx.state.temaRascunho.cores[chave];
   const fundo = chave === 'botaoTexto' ? valorCor('botaoFundo') : T().FUNDO_SITE;
-  const l = T().leitura(atual, fundo);
+  // a frase da capa fica sobre o vídeo (claro e escuro ao mesmo tempo): a sombra garante a leitura, sem selo
+  const l = chave === 'capaFrase' ? null : T().leitura(atual, fundo);
   const corNivel = !l ? '' : l.razao >= 4.5 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : l.razao >= 3 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-red-50 text-red-700 border-red-200';
   return `
     <div class="space-y-2">
@@ -214,7 +216,7 @@ function seletorFonte(chave) {
 function cartaoTipo(t) {
   const corTxt = valorCor(t.cor2 ? 'botaoTexto' : t.cor);
   const fundo = t.cor2 ? valorCor('botaoFundo') : T().FUNDO_SITE;
-  const fonteEx = t.fonte ? familia(valorFonte(t.fonte)) : familia(valorFonte('titulos'));
+  const fonteEx = t.fonte ? familia(valorFonte(t.fonte)) : familia(valorFonte(t.id === 'capa' ? 'textos' : 'titulos'));
   return `
     <div class="bg-white rounded-3xl p-5 sm:p-6 border border-[#C5A880]/30 shadow-sm space-y-4">
       <div class="flex items-start justify-between gap-3">
@@ -224,13 +226,13 @@ function cartaoTipo(t) {
         </div>
         <button type="button" class="ap-restaurar-tipo text-[11px] text-stone-400 hover:text-dfgreen underline whitespace-nowrap" data-tipo="${t.id}">Voltar ao padrão</button>
       </div>
-      <div class="rounded-2xl px-4 py-3 text-lg" style="background:${t.cor2 ? '#0a1c0d' : fundo}">
+      <div class="rounded-2xl px-4 py-3 text-lg" style="background:${t.id === 'capa' ? 'linear-gradient(135deg,#d9dde0,#f4f1ea 55%,#b9c2c7)' : t.cor2 ? '#0a1c0d' : fundo};${t.id === 'capa' ? 'text-shadow:0 2px 10px rgba(0,0,0,.75),0 0 2px rgba(0,0,0,.6)' : ''}">
         ${t.cor2
           ? `<span class="inline-block px-4 py-2 rounded-md text-sm font-semibold" style="background:${valorCor('botaoFundo')};color:${corTxt};font-family:${fonteEx}">${t.exemplo}</span>`
           : `<span style="color:${corTxt};font-family:${fonteEx}">${t.exemplo}</span>`}
       </div>
       ${t.cor2 ? seletorCor(t, 'botaoFundo', 'Cor do botão') + seletorCor(t, 'botaoTexto', 'Cor do texto do botão') : seletorCor(t, t.cor, 'Cor')}
-      ${t.fonte ? seletorFonte(t.fonte) : '<p class="text-[11px] text-stone-400">A fonte dos destaques acompanha a fonte dos Títulos.</p>'}
+      ${t.fonte ? seletorFonte(t.fonte) : `<p class="text-[11px] text-stone-400">${t.semFonte || 'A fonte dos destaques acompanha a fonte dos Títulos.'}</p>`}
     </div>`;
 }
 
