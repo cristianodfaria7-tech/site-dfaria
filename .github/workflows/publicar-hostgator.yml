@@ -19,6 +19,14 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # chamado pelo "Publicar no site" do Painel do Chef (publicar-painel.yml), depois do commit do tema
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit/branch a publicar
+        type: string
+        required: false
+        default: ''
 
 concurrency:
   group: publicar-hostgator
@@ -42,6 +50,8 @@ jobs:
 
       - name: Baixar o código
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
 
       - name: Conferir arquivos essenciais antes de publicar
         run: |
@@ -86,6 +96,8 @@ jobs:
             cardapios.html.backup
             api/**
             gerador-cardapios/**
+            gerador-painel/**
+            supabase/**
 
       - name: Conferir no ar - as 53 URLs travadas respondem
         run: |

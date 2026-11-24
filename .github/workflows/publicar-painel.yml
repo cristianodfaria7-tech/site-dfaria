@@ -1,0 +1,70 @@
+# Botão "Publicar no site" do Painel do Chef.
+# Disparado pela função painel-publicar (Supabase). Faz, em ordem:
+#   1. aplica o tema salvo no painel (assets/tema.css + link em todas as páginas)
+#   2. TRAVA: confere que nenhuma URL mudou (se mudou, para tudo)
+#   3. grava a mudança no histórico (commit na main, autor "Painel do Chef")
+#   4. envia para a HostGator e confere as 53 URLs no ar (publicar-hostgator.yml)
+
+name: Publicar pelo Painel do Chef
+
+on:
+  workflow_dispatch:
+    inputs:
+      pedido_por:
+        description: Quem pediu (e-mail do painel)
+        required: false
+        default: painel
+
+concurrency:
+  group: publicar-painel
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  preparar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      ref: ${{ steps.commit.outputs.ref }}
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Aplicar o tema (cores e fontes) salvo no painel
+        run: node gerador-painel/aplicar-tema.mjs .
+
+      - name: TRAVA - nenhuma URL pode mudar
+        run: node .github/travas/verificar-site.mjs
+
+      - name: Gravar no histórico (commit)
+        id: commit
+        env:
+          PEDIDO_POR: ${{ inputs.pedido_por }}
+        run: |
+          git config user.name "Painel do Chef"
+          git config user.email "painel@dfariagastronomia.com.br"
+          git add assets/tema.css gerador-cardapios/molde/estilos.html
+          git add -u -- '*.html'
+          if git diff --cached --quiet; then
+            echo "Nada mudou no tema; publica assim mesmo (pode haver outras mudanças já na main)."
+          else
+            git commit -m "painel: publicar (pedido por ${PEDIDO_POR})"
+            git push origin HEAD:main
+          fi
+          echo "ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  publicar:
+    needs: preparar
+    uses: ./.github/workflows/publicar-hostgator.yml
+    with:
+      ref: ${{ needs.preparar.outputs.ref }}
+    secrets: inherit

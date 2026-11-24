@@ -2,6 +2,8 @@
 // Gerencia 100% dos Cardápios Oficiais (17 itens) e Páginas do Site (19 páginas)
 // URL: /painel | Privado, Seguro (Supabase Auth), Responsivo e Simples (Regra Zero)
 
+import * as extras from './painel-extras.js?v=20261123a';
+
 const SUPABASE_URL = 'https://gcwxhawqvtqhpoohihjo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_yeda5BcY2QZyBoVMi4r_0Q_Hbxc5Ex2';
 
@@ -2981,7 +2983,18 @@ const state = {
   activeTab: 'geral', // Cardápios: 'geral', 'secoes', 'colar' | Páginas: 'banner', 'secoes', 'especifico', 'seo'
   loading: false,
   feedback: null,
-  pasteText: ''
+  pasteText: '',
+  // Painel 2.0
+  papel: null,          // 'dono' | 'editor' | null (sem acesso)
+  meuNome: '',
+  temaSalvo: {},
+  temaRascunho: null,
+  usuarios: null,
+  novoUsuario: null,
+  confirmar: null,
+  publicacao: null,
+  apPagina: '/',
+  apCelular: false
 };
 
 // Cliente REST / Auth Supabase leve e resiliente
@@ -3009,6 +3022,24 @@ const api = {
       throw new Error(msg);
     }
     return data;
+  },
+
+  // Renova a sessão com o refresh token (antes a sessão expirava e o painel "deslogava" sozinho)
+  async refresh() {
+    if (!state.refreshToken) return false;
+    const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=refresh_token', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: state.refreshToken })
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    state.token = data.access_token;
+    state.refreshToken = data.refresh_token;
+    if (data.user) state.user = data.user;
+    localStorage.setItem('df_chef_token', state.token);
+    localStorage.setItem('df_chef_refresh', state.refreshToken);
+    return true;
   },
 
   async getUser() {
@@ -3090,15 +3121,28 @@ const api = {
               const pid = r.id.replace(/^page_/, '');
               if (mapa[pid]) {
                 const neg = { ...r.negocio };
-                if (neg.hero && neg.hero.imagem && neg.hero.imagem.src && neg.hero.imagem.src.includes('/reviews/')) {
-                  neg.hero.imagem.src = '/assets/hero-dfaria-luxo.jpg';
-                  neg.hero.imagem.alt = 'Banquete de alta gastronomia e buffet para eventos — D’Faria Gastronomia';
+                if (neg.hero && neg.hero.imagem && neg.hero.imagem.src && (neg.hero.imagem.src.includes('/reviews/') || neg.hero.imagem.src.includes('midia-1795375758870'))) {
+                  neg.hero.imagem.src = pid === 'home' ? '/assets/hero-cinematic-poster.jpg' : '/assets/hero-dfaria-luxo.jpg';
+                  neg.hero.imagem.alt = pid === 'home' ? "D'Faria Gastronomia e Eventos" : 'Banquete de alta gastronomia e buffet para eventos — D’Faria Gastronomia';
                 }
                 if (neg.hero && neg.hero.titulo) {
-                  neg.hero.titulo = neg.hero.titulo.replace(/CHEF/gi, 'CHEF').trim();
+                  neg.hero.titulo = neg.hero.titulo.replace(/CHEFFE/gi, 'CHEF').replace(/CHEF\s+CRISTIANO/gi, 'CHEF CRISTIANO').trim();
                 }
                 if (neg.hero && neg.hero.subtitulo) {
-                  neg.hero.subtitulo = neg.hero.subtitulo.replace(/VOCÊ/gi, 'VOCÊ').trim();
+                  neg.hero.subtitulo = neg.hero.subtitulo.replace(/VOCÊVOCÊ/gi, 'VOCÊ').trim();
+                }
+                if (pid === 'home') {
+                  neg.hero = neg.hero || {};
+                  neg.hero.video = {
+                    src: '/assets/dfaria-hero-cinematic.mp4',
+                    poster: '/assets/hero-cinematic-poster.jpg'
+                  };
+                  if (!neg.hero.imagem || neg.hero.imagem.src.includes('midia-1795375758870') || neg.hero.imagem.src.includes('/reviews/')) {
+                    neg.hero.imagem = {
+                      src: '/assets/hero-cinematic-poster.jpg',
+                      alt: "D'Faria Gastronomia e Eventos"
+                    };
+                  }
                 }
                 mapa[pid] = { ...mapa[pid], ...neg };
               }
@@ -3283,9 +3327,15 @@ function render() {
   if (!state.user) {
     app.innerHTML = renderLogin();
     attachLoginEvents();
+  } else if (!state.papel) {
+    // logado, mas fora da lista de usuários do painel
+    app.innerHTML = extras.renderSemAcesso();
+    const sair = document.getElementById('btn-logout');
+    if (sair) sair.addEventListener('click', sairDoPainel);
   } else {
     app.innerHTML = renderDashboard();
     attachDashboardEvents();
+    extras.ligarEventos();
   }
 
   // Atualizar ícones do Lucide
@@ -3343,6 +3393,8 @@ function renderLogin() {
 // Tela Principal (Dashboard e Editor)
 function renderDashboard() {
   const isPage = state.viewMode === 'paginas';
+  const isMenus = state.viewMode === 'cardapios';
+  const isExtra = !isPage && !isMenus; // 'aparencia' ou 'config'
   const item = isPage ? state.selectedPage : state.selectedMenu;
 
   return `
@@ -3366,11 +3418,14 @@ function renderDashboard() {
               <i data-lucide="layout" class="w-3.5 h-3.5"></i>
               <span>Páginas (${Object.keys(state.pages).length})</span>
             </button>
-            <button id="btn-toggle-menus" class="py-1.5 px-3 rounded-lg transition-all flex items-center gap-1.5 ${!isPage ? 'bg-dfgold text-dfgreen shadow-sm' : 'text-white/80 hover:text-white'}">
+            <button id="btn-toggle-menus" class="py-1.5 px-3 rounded-lg transition-all flex items-center gap-1.5 ${isMenus ? 'bg-dfgold text-dfgreen shadow-sm' : 'text-white/80 hover:text-white'}">
               <i data-lucide="utensils" class="w-3.5 h-3.5"></i>
               <span>Cardápios (${state.menus.length})</span>
             </button>
+            ${extras.botoesCabecalho()}
           </div>
+
+          ${extras.botaoPublicar()}
 
           <a href="/" target="_blank" class="hidden md:inline-flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition-colors">
             <i data-lucide="external-link" class="w-3.5 h-3.5 text-dfgold"></i>
@@ -3392,8 +3447,9 @@ function renderDashboard() {
       </div>
     ` : ''}
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
-      
+    ${isExtra ? extras.renderCorpo() : `
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 pb-24">
+
       <!-- Coluna da Esquerda: Navegação (Páginas ou Cardápios) -->
       <aside class="lg:col-span-4 space-y-4">
         ${isPage ? renderSidebarPages() : renderSidebarMenus()}
@@ -3404,7 +3460,8 @@ function renderDashboard() {
         ${isPage ? renderPageEditor(state.selectedPage) : renderMenuEditor(state.selectedMenu)}
       </section>
 
-    </main>
+    </main>`}
+    <div id="df-barra-publicacao">${extras.barraPublicacao()}</div>
   `;
 }
 
@@ -4082,19 +4139,24 @@ function attachLoginEvents() {
   });
 }
 
+function sairDoPainel() {
+  localStorage.removeItem('df_chef_token');
+  localStorage.removeItem('df_chef_refresh');
+  state.token = null;
+  state.refreshToken = null;
+  state.user = null;
+  state.papel = null;
+  state.selectedMenu = null;
+  state.viewMode = 'paginas';
+  render();
+}
+
 // Eventos do Dashboard
 function attachDashboardEvents() {
   // Logout
   const btnLogout = document.getElementById('btn-logout');
   if (btnLogout) {
-    btnLogout.addEventListener('click', () => {
-      localStorage.removeItem('df_chef_token');
-      localStorage.removeItem('df_chef_refresh');
-      state.token = null;
-      state.user = null;
-      state.selectedMenu = null;
-      render();
-    });
+    btnLogout.addEventListener('click', sairDoPainel);
   }
 
   // Alternador de Visão (Páginas vs Cardápios)
@@ -4563,6 +4625,8 @@ async function loadInitialData() {
   state.menus = menus;
   state.pricingConfig = pricing;
   state.pages = pages;
+  await Promise.all([extras.carregarPapel(), extras.carregarTema()]);
+  if (state.papel !== 'dono' && (state.viewMode === 'aparencia' || state.viewMode === 'config')) state.viewMode = 'paginas';
 
   if (state.menus.length > 0 && !state.selectedMenu) {
     state.selectedMenu = state.menus[0];
@@ -4574,14 +4638,17 @@ async function loadInitialData() {
 
 // Inicialização
 async function init() {
-  if (state.token) {
+  extras.instalarExtras({ state, api, render, SUPABASE_URL, SUPABASE_KEY });
+  if (state.token || state.refreshToken) {
     try {
       state.user = await api.getUser();
+      if (!state.user && await api.refresh()) state.user = await api.getUser();
       if (state.user) {
         await loadInitialData();
       } else {
         state.token = null;
         localStorage.removeItem('df_chef_token');
+        localStorage.removeItem('df_chef_refresh');
       }
     } catch (e) {
       state.token = null;
@@ -4589,6 +4656,8 @@ async function init() {
     }
   }
   render();
+  // renova a sessão a cada 40 minutos enquanto o painel estiver aberto (o acesso dura 1 hora)
+  setInterval(() => { if (state.user) api.refresh(); }, 40 * 60 * 1000);
 }
 
 init();
