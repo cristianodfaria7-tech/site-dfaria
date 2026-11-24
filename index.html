@@ -62,6 +62,23 @@ span[class*="cinema-ambient-lighting"],
 }
 @media (min-width: 768px) { #hero > div.z-10 > p { font-size: 1.125rem; } }
 </style>
+
+<script id="hero-video-lento">
+/* Vídeo da capa mais lento. VELOCIDADE: 1 = normal, 0.5 = metade. */
+(function () {
+  var VELOCIDADE = 0.5;
+  function ajustar() {
+    var v = document.getElementById('hero-cinema-video');
+    if (!v) return;
+    v.defaultPlaybackRate = VELOCIDADE;
+    if (v.playbackRate !== VELOCIDADE) v.playbackRate = VELOCIDADE;
+  }
+  document.addEventListener('play', function (e) { if (e.target && e.target.id === 'hero-cinema-video') ajustar(); }, true);
+  document.addEventListener('loadedmetadata', function (e) { if (e.target && e.target.id === 'hero-cinema-video') ajustar(); }, true);
+  document.addEventListener('DOMContentLoaded', ajustar);
+  var n = 0, t = setInterval(function () { ajustar(); if (++n > 20) clearInterval(t); }, 1000);
+})();
+</script>
 </head><body><!--$--><div class="original-site"><header class="site-header site-header-floating"><div class="site-header-inner"><a aria-label="D’Faria Gastronomia e Eventos — página inicial" class="site-brand active" href="/" data-status="active" aria-current="page"><img src="/__l5e/assets-v1/b202527e-f737-41f0-87e3-8eaae4e6c2db/logo-dfaria.webp" alt="D’Faria Gastronomia e Eventos"/><span>Gastronomia e Eventos</span></a><nav class="site-desktop-nav" aria-label="Navegação principal"><a href="/eventos">Eventos</a><a href="/eventos-corporativos">Corporativos</a><a href="/gastronomia">Gastronomia</a><a href="/cardapios">Cardápios</a><a href="/frios-e-finger-food">Ilhas de Frios</a><a href="/alugue-material-para-festa">Locação</a><a href="/o-dfaria">O D’Faria</a><a href="/regioes">Regiões</a><a href="/galeria">Galeria</a><a href="/faq">FAQ</a><a href="/painel" class="text-gold font-bold transition-colors hover:text-goldlight">Painel do Chef</a><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 site-quote-button">Solicitar orçamento</button></nav><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-9 w-9 site-menu-button" aria-expanded="false" aria-controls="menu-mobile" aria-label="Abrir menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu" aria-hidden="true"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg></button></div></header><main id="conteudo" class="df-editorial-layout"><section id="hero" class="relative isolate flex min-h-screen h-[100svh] w-full items-center justify-center overflow-hidden">
 <!-- Palco Cinematográfico Padrão Fasano: 100vw x 100vh em Altíssima Definição 60fps (Champagne & Cristal Autêntico D'Faria) -->
 <div class="absolute inset-0 -z-20 w-full h-full overflow-hidden">
