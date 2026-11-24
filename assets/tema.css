@@ -1,1 +1,7 @@
 /* D’Faria — tema do site (gerado pelo Painel do Chef). Não editar à mão. */
+body:not(#df-tema-x) #hero p,
+body:not(#df-tema-x) .df-hero-sub{color:#f8121d!important;text-shadow:0 2px 10px rgba(0,0,0,.75),0 0 2px rgba(0,0,0,.6)!important}
+body:not(#df-tema-x) .df-btn-primary,
+body:not(#df-tema-x) .site-quote-button,
+body:not(#df-tema-x) .quote-submit,
+body:not(#df-tema-x) .site-mobile-nav > button{background:#cfa853!important;border-color:#cfa853!important;}
