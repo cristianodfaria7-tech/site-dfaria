@@ -19,7 +19,7 @@ function github(caminho: string, init: RequestInit = {}) {
   return fetch(`https://api.github.com/repos/${REPO}${caminho}`, {
     ...init,
     headers: {
-      Authorization: `Bearer ${Deno.env.get('GH_TOKEN')}`,
+      Authorization: `Bearer ${(Deno.env.get('GH_TOKEN') || '').trim()}`,
       Accept: 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
       'User-Agent': 'painel-do-chef',
@@ -31,7 +31,7 @@ function github(caminho: string, init: RequestInit = {}) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return erro('Use POST.', 405);
-  if (!Deno.env.get('GH_TOKEN')) return erro('Falta configurar o segredo GH_TOKEN no Supabase.', 500);
+  if (!(Deno.env.get('GH_TOKEN') || '').trim()) return erro('Falta configurar o segredo GH_TOKEN no Supabase.', 500);
 
   const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
     auth: { persistSession: false, autoRefreshToken: false },
