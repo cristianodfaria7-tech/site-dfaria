@@ -3134,7 +3134,7 @@ const api = {
                 if (pid === 'home') {
                   neg.hero = neg.hero || {};
                   neg.hero.video = {
-                    src: '/assets/dfaria-hero-cinematic.mp4',
+                    src: '/assets/dfaria-hero-champanhe.mp4',
                     poster: '/assets/hero-cinematic-poster.jpg'
                   };
                   if (!neg.hero.imagem || neg.hero.imagem.src.includes('midia-1795375758870') || neg.hero.imagem.src.includes('/reviews/')) {
@@ -3676,7 +3676,7 @@ function renderPageTabBanner(p) {
                 </div>
                 <div>
                   <p class="text-xs font-bold text-dfgreen">Vídeo de Champagne & Taças de Cristal (60fps Full HD)</p>
-                  <p class="text-[10px] text-stone-500">Arquivo: /assets/dfaria-hero-cinematic.mp4 · Padrão Fasano</p>
+                  <p class="text-[10px] text-stone-500">Arquivo: /assets/dfaria-hero-champanhe.mp4 · Padrão Fasano</p>
                 </div>
               </div>
               <a href="/" target="_blank" class="py-1.5 px-3 rounded-lg bg-dfgreen text-white text-xs font-bold hover:bg-dfgreendeep transition-all shadow-sm flex items-center gap-1 shrink-0">
@@ -4512,7 +4512,7 @@ function syncPageFormDataToState(opts = {}) {
       // Garantir que a Home preserva o vídeo cinematográfico Fasano
       if (!p.hero) p.hero = {};
       p.hero.video = {
-        src: '/assets/dfaria-hero-cinematic.mp4',
+        src: '/assets/dfaria-hero-champanhe.mp4',
         poster: '/assets/hero-cinematic-poster.jpg'
       };
       if (!p.hero.imagem) {
