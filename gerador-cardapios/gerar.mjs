@@ -208,7 +208,6 @@ function paginaLista(L) {
     `<p class="mt-6 max-w-[46ch] font-brand text-xl text-stone text-pretty lg:text-2xl">${esc(L.chamada)}</p><p class="mt-6 max-w-[58ch] text-base text-stone text-pretty">${esc(L.introducao)}</p>` +
     '<div class="mt-8 flex flex-wrap items-center gap-3">' +
     L.categorias.map((c) => `<a class="rounded-full px-4 py-2 text-sm text-graphite ring-1 ring-graphite/15 transition-colors hover:bg-ivory hover:ring-graphite/30" href="#${esc(c.id)}">${esc(c.titulo)}</a>`).join('') +
-    `<a class="rounded-full px-4 py-2 text-sm font-bold bg-[#173023] text-[#C5A880] ring-1 ring-[#C5A880]/40 transition-colors hover:bg-[#0F2118]" href="/painel">👨‍🍳 Painel do Chef</a>` +
     `</div></div></section><section class="bg-ivory"><div class="mx-auto max-w-6xl px-6 py-16 lg:px-10 lg:py-24">${cats}` +
     `<div class="mt-20 rounded-3xl bg-sand p-8 lg:mt-28 lg:p-12"><h2 class="font-display text-2xl font-medium text-graphite">${esc(F.titulo)}</h2><p class="mt-4 max-w-[58ch] text-base text-stone text-pretty">${esc(F.texto)}</p><ul class="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm">` +
     F.links.map((l) => `<li><a class="text-green underline-offset-4 transition-colors hover:text-greendeep hover:underline"${TSD} href="${esc(l.href)}">${esc(l.texto)}</a></li>`).join('') +
