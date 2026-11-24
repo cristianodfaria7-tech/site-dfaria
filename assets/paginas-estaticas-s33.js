@@ -1,7 +1,8 @@
-﻿/* D'Faria — script das páginas estáticas (cardápios).
-   Faz, sem React, o mesmo que o React faz nas outras páginas:
+﻿/* D'Faria — script de TODAS as páginas (versão s33; o site não usa mais React).
    Google Analytics (page_view e clique_whatsapp/clique_telefone), menu do celular,
-   janela "Solicite seu orçamento" com o formulário que abre o WhatsApp. */
+   janela "Solicite seu orçamento" e formulário da página /orcamento (abrem o WhatsApp),
+   ampliar foto (anterior/próxima, setas do teclado), filtros da galeria,
+   animações de entrada iguais às do site. */
 (function () {
   'use strict';
   var GA = 'G-682595J4L0';
@@ -195,6 +196,127 @@
     st.querySelector('a').href = url;
     window.open(url, '_blank', 'noopener');
   }
+
+  /* ---------- formulário fixo da página (ex.: /orcamento) ---------- */
+  document.querySelectorAll('form.quote-form').forEach(function (f) {
+    if (f.closest('.df-dialog-content')) return;
+    f.addEventListener('submit', enviar);
+  });
+
+  /* ---------- galeria: filtros por categoria ---------- */
+  var filtroAtual = 'Todos';
+  var botoesFiltro = Array.prototype.slice.call(document.querySelectorAll('main button[aria-pressed]'));
+  function aplicarFiltro(nome) {
+    filtroAtual = nome;
+    botoesFiltro.forEach(function (b) { b.setAttribute('aria-pressed', b.textContent.trim() === nome ? 'true' : 'false'); });
+    document.querySelectorAll('main button[data-categoria]').forEach(function (b) {
+      b.style.display = (nome === 'Todos' || b.getAttribute('data-categoria') === nome) ? '' : 'none';
+    });
+  }
+  botoesFiltro.forEach(function (b) {
+    b.addEventListener('click', function () { fecharFoto(); aplicarFiltro(b.textContent.trim()); });
+  });
+
+  /* ---------- ampliar foto ---------- */
+  var ICONE_ESQ = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>';
+  var ICONE_DIR = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>';
+  var foto = null;
+  function fotosVisiveis() {
+    var r = [];
+    document.querySelectorAll('.original-site button:not([aria-pressed])').forEach(function (b) {
+      if (b.style.display === 'none' || /orcamento|orçamento/i.test(b.textContent + ' ' + b.className)) return;
+      var im = b.querySelector('img');
+      if (im && im.getAttribute('src')) r.push({ src: im.getAttribute('src'), alt: im.getAttribute('alt') || '' });
+    });
+    document.querySelectorAll('[data-lightbox-src]').forEach(function (d) {
+      r.push({ src: d.getAttribute('data-lightbox-src'), alt: d.getAttribute('data-lightbox-caption') || '' });
+    });
+    return r;
+  }
+  function mostrarFoto(f) {
+    foto.atual = f;
+    var fig = foto.dialogo.querySelector('figure');
+    fig.querySelector('img').src = f.src; fig.querySelector('img').alt = f.alt;
+    fig.querySelector('figcaption').textContent = f.alt;
+    foto.dialogo.querySelector('.sr-only').textContent = f.alt || 'Foto do evento';
+  }
+  function andarFoto(passo) {
+    if (!foto) return;
+    var l = fotosVisiveis(); if (!l.length) return;
+    var i = -1;
+    for (var k = 0; k < l.length; k++) if (l[k].src === foto.atual.src) { i = k; break; }
+    mostrarFoto(l[(i + passo + l.length) % l.length]);
+  }
+  function teclasFoto(ev) {
+    if (!foto) return;
+    if (ev.key === 'Escape') { ev.preventDefault(); fecharFoto(); }
+    else if (ev.key === 'ArrowLeft') andarFoto(-1);
+    else if (ev.key === 'ArrowRight') andarFoto(1);
+  }
+  function abrirFoto(f, origem) {
+    if (foto) { mostrarFoto(f); return; }
+    var fundo = document.createElement('div');
+    fundo.className = 'df-dialog-overlay'; fundo.setAttribute('data-state', 'open');
+    var d = document.createElement('div');
+    d.setAttribute('role', 'dialog'); d.className = 'df-photo-dialog'; d.setAttribute('data-state', 'open'); d.tabIndex = -1;
+    d.innerHTML = '<h2 class="sr-only"></h2><p class="sr-only">Fotografia de um evento D’Faria.</p>' +
+      '<figure><img src="" alt=""><figcaption></figcaption></figure>' +
+      '<button class="' + BTN + 'hover:bg-accent hover:text-accent-foreground h-9 w-9 df-photo-prev" aria-label="Foto anterior" type="button">' + ICONE_ESQ + '</button>' +
+      '<button class="' + BTN + 'hover:bg-accent hover:text-accent-foreground h-9 w-9 df-photo-next" aria-label="Próxima foto" type="button">' + ICONE_DIR + '</button>' +
+      '<button class="' + BTN + 'hover:bg-accent hover:text-accent-foreground h-9 w-9 df-dialog-close" aria-label="Fechar foto" type="button">' + ICONE_X + '</button>';
+    document.body.appendChild(fundo); document.body.appendChild(d);
+    foto = { fundo: fundo, dialogo: d, origem: origem, overflow: document.body.style.overflow, atual: f };
+    document.body.style.overflow = 'hidden';
+    mostrarFoto(f);
+    fundo.addEventListener('click', fecharFoto);
+    d.querySelector('.df-photo-prev').addEventListener('click', function () { andarFoto(-1); });
+    d.querySelector('.df-photo-next').addEventListener('click', function () { andarFoto(1); });
+    d.querySelector('.df-dialog-close').addEventListener('click', fecharFoto);
+    document.addEventListener('keydown', teclasFoto, true);
+    d.focus();
+  }
+  function fecharFoto() {
+    if (!foto) return;
+    foto.fundo.remove(); foto.dialogo.remove();
+    document.body.style.overflow = foto.overflow;
+    document.removeEventListener('keydown', teclasFoto, true);
+    var o = foto.origem; foto = null;
+    if (o && o.focus) o.focus();
+  }
+  document.addEventListener('click', function (ev) {
+    if (!(ev.target instanceof Element) || ev.target.closest('.df-photo-dialog, .df-dialog-content')) return;
+    var b = ev.target.closest('.original-site button:not([aria-pressed])');
+    if (b && !/orcamento|orçamento/i.test(b.textContent + ' ' + b.className)) {
+      var im = b.querySelector('img');
+      if (im && im.getAttribute('src')) { abrirFoto({ src: im.getAttribute('src'), alt: im.getAttribute('alt') || '' }, b); return; }
+    }
+    var q = ev.target.closest('[data-lightbox-src]');
+    if (q) abrirFoto({ src: q.getAttribute('data-lightbox-src'), alt: q.getAttribute('data-lightbox-caption') || '' }, q);
+  });
+
+  /* ---------- animações de entrada (mesmas regras do site) ---------- */
+  (function () {
+    if (!document.querySelector('.original-site')) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+    var obs = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('df-in'); obs.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px 80px 0px', threshold: 0.01 });
+    var obsLinha = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.remove('df-line-wait'); obsLinha.unobserve(e.target); } });
+    }, { threshold: 0.01 });
+    var sel = '.original-site main section:not(:first-child) h2, .original-site main section:not(:first-child) .grid > a, .original-site main section:not(:first-child) .grid > article, .original-site main section:not(:first-child) figure, .original-site main section:not(:first-child) .grid > button:has(img), .original-site .df-city-list > li, .original-site .df-trust-quote';
+    var els; try { els = document.querySelectorAll(sel); } catch (e) { els = document.querySelectorAll(sel.replace(', .original-site main section:not(:first-child) .grid > button:has(img)', '')); }
+    document.querySelectorAll('.original-site .df-city-list > li').forEach(function (e, i) { e.style.setProperty('--i', String(i)); });
+    els.forEach(function (e) {
+      if (e.classList.contains('df-in')) return;
+      if (e.getBoundingClientRect().top > window.innerHeight) e.classList.add('df-reveal');
+      obs.observe(e);
+    });
+    document.querySelectorAll('.original-site main section:not(:first-child) span.h-px.bg-gold').forEach(function (e) {
+      if (e.getBoundingClientRect().top > window.innerHeight) e.classList.add('df-line-wait');
+      obsLinha.observe(e);
+    });
+  })();
 
   /* ---------- Sincronização ao vivo com Supabase (Tempo Real) ---------- */
   var SUPABASE_URL = 'https://gcwxhawqvtqhpoohihjo.supabase.co';
