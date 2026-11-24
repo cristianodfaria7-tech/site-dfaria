@@ -243,7 +243,11 @@
         "feijoada-completa",
         "almoco-especial-de-carnes-e-peixe",
         "almoco-franco-americano"
-      ]
+      ],
+      "preco": {
+        "p100": 185,
+        "churrasco": false
+      }
     },
     {
       "slug": "feijoada-completa",
