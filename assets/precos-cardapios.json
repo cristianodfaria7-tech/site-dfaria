@@ -1,7 +1,71 @@
 {
   "cardapios": {
     "almoco-classico-com-mesa-de-frios": {
+      "p100": 165,
+      "churrasco": false
+    },
+    "feijoada-completa": {
+      "p100": 125,
+      "churrasco": false
+    },
+    "almoco-especial-de-carnes-e-peixe": {
+      "p100": 165,
+      "churrasco": false
+    },
+    "almoco-franco-americano": {
+      "p100": 165,
+      "churrasco": false
+    },
+    "almoco-com-churrasco-e-mesa-de-frios": {
       "p100": 185,
+      "churrasco": false
+    },
+    "almoco-com-ilha-gastronomica": {
+      "p100": 185,
+      "churrasco": false
+    },
+    "almoco-completo-com-ilha-de-frios-e-finger-food": {
+      "p100": 195,
+      "churrasco": false
+    },
+    "jantar-tradicional-de-frango": {
+      "p100": 135,
+      "churrasco": false
+    },
+    "jantar-completo-selecao-de-carnes-e-massas": {
+      "p100": 155,
+      "churrasco": false
+    },
+    "jantar-completo-versao-especial": {
+      "p100": 185,
+      "churrasco": false
+    },
+    "experiencia-de-fogo-de-chao-e-parrilla": {
+      "p100": 185,
+      "churrasco": false
+    },
+    "festival-de-massas": {
+      "p100": 155,
+      "churrasco": false
+    },
+    "crepes-franceses": {
+      "p100": 130,
+      "churrasco": false
+    },
+    "brunch-com-pizza": {
+      "p100": 130,
+      "churrasco": false
+    },
+    "cafe-colonial": {
+      "p100": 130,
+      "churrasco": false
+    },
+    "cafe-da-manha-com-mini-sanduiches": {
+      "p100": 120,
+      "churrasco": false
+    },
+    "debutante-ilha-de-frios-e-massa": {
+      "p100": 155,
       "churrasco": false
     }
   }

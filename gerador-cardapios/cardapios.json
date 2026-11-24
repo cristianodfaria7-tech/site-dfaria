@@ -245,7 +245,7 @@
         "almoco-franco-americano"
       ],
       "preco": {
-        "p100": 185,
+        "p100": 165,
         "churrasco": false
       }
     },
@@ -314,7 +314,11 @@
         "almoco-classico-com-mesa-de-frios",
         "almoco-especial-de-carnes-e-peixe",
         "almoco-franco-americano"
-      ]
+      ],
+      "preco": {
+        "p100": 125,
+        "churrasco": false
+      }
     },
     {
       "slug": "almoco-especial-de-carnes-e-peixe",
@@ -405,7 +409,11 @@
         "almoco-classico-com-mesa-de-frios",
         "feijoada-completa",
         "almoco-franco-americano"
-      ]
+      ],
+      "preco": {
+        "p100": 165,
+        "churrasco": false
+      }
     },
     {
       "slug": "almoco-franco-americano",
@@ -473,7 +481,11 @@
       "outros": [
         "almoco-classico-com-mesa-de-frios",
         "almoco-com-churrasco-e-mesa-de-frios"
-      ]
+      ],
+      "preco": {
+        "p100": 165,
+        "churrasco": false
+      }
     },
     {
       "slug": "almoco-com-churrasco-e-mesa-de-frios",
@@ -540,7 +552,11 @@
       "outros": [
         "experiencia-de-fogo-de-chao-e-parrilla",
         "almoco-classico-com-mesa-de-frios"
-      ]
+      ],
+      "preco": {
+        "p100": 185,
+        "churrasco": false
+      }
     },
     {
       "slug": "almoco-com-ilha-gastronomica",
@@ -597,7 +613,11 @@
       "outros": [
         "festival-de-massas",
         "almoco-franco-americano"
-      ]
+      ],
+      "preco": {
+        "p100": 185,
+        "churrasco": false
+      }
     },
     {
       "slug": "almoco-completo-com-ilha-de-frios-e-finger-food",
@@ -658,7 +678,11 @@
       "outros": [
         "almoco-classico-com-mesa-de-frios",
         "almoco-especial-de-carnes-e-peixe"
-      ]
+      ],
+      "preco": {
+        "p100": 195,
+        "churrasco": false
+      }
     },
     {
       "slug": "jantar-tradicional-de-frango",
@@ -720,7 +744,11 @@
       "outros": [
         "jantar-completo-selecao-de-carnes-e-massas",
         "almoco-classico-com-mesa-de-frios"
-      ]
+      ],
+      "preco": {
+        "p100": 135,
+        "churrasco": false
+      }
     },
     {
       "slug": "jantar-completo-selecao-de-carnes-e-massas",
@@ -779,7 +807,11 @@
       "outros": [
         "jantar-completo-versao-especial",
         "almoco-especial-de-carnes-e-peixe"
-      ]
+      ],
+      "preco": {
+        "p100": 155,
+        "churrasco": false
+      }
     },
     {
       "slug": "jantar-completo-versao-especial",
@@ -831,7 +863,11 @@
       "outros": [
         "jantar-completo-selecao-de-carnes-e-massas",
         "almoco-completo-com-ilha-de-frios-e-finger-food"
-      ]
+      ],
+      "preco": {
+        "p100": 185,
+        "churrasco": false
+      }
     },
     {
       "slug": "experiencia-de-fogo-de-chao-e-parrilla",
@@ -883,7 +919,11 @@
       ],
       "outros": [
         "almoco-com-churrasco-e-mesa-de-frios"
-      ]
+      ],
+      "preco": {
+        "p100": 185,
+        "churrasco": false
+      }
     },
     {
       "slug": "festival-de-massas",
@@ -929,7 +969,11 @@
       "outros": [
         "almoco-com-ilha-gastronomica",
         "crepes-franceses"
-      ]
+      ],
+      "preco": {
+        "p100": 155,
+        "churrasco": false
+      }
     },
     {
       "slug": "crepes-franceses",
@@ -977,7 +1021,11 @@
       "outros": [
         "festival-de-massas",
         "brunch-com-pizza"
-      ]
+      ],
+      "preco": {
+        "p100": 130,
+        "churrasco": false
+      }
     },
     {
       "slug": "brunch-com-pizza",
@@ -1024,7 +1072,11 @@
       "outros": [
         "cafe-colonial",
         "crepes-franceses"
-      ]
+      ],
+      "preco": {
+        "p100": 130,
+        "churrasco": false
+      }
     },
     {
       "slug": "cafe-colonial",
@@ -1079,7 +1131,11 @@
       "outros": [
         "cafe-da-manha-com-mini-sanduiches",
         "brunch-com-pizza"
-      ]
+      ],
+      "preco": {
+        "p100": 130,
+        "churrasco": false
+      }
     },
     {
       "slug": "cafe-da-manha-com-mini-sanduiches",
@@ -1131,7 +1187,11 @@
       "outros": [
         "cafe-colonial",
         "almoco-franco-americano"
-      ]
+      ],
+      "preco": {
+        "p100": 120,
+        "churrasco": false
+      }
     },
     {
       "slug": "debutante-ilha-de-frios-e-massa",
@@ -1185,7 +1245,11 @@
       "outros": [
         "festival-de-massas",
         "almoco-com-ilha-gastronomica"
-      ]
+      ],
+      "preco": {
+        "p100": 155,
+        "churrasco": false
+      }
     }
   ]
 }
