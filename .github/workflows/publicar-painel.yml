@@ -1,6 +1,7 @@
 # Botão "Publicar no site" do Painel do Chef.
 # Disparado pela função painel-publicar (Supabase). Faz, em ordem:
-#   1. aplica o tema salvo no painel (assets/tema.css + link em todas as páginas)
+#   1. aplica o tema salvo no painel (assets/tema.css + link em todas as páginas),
+#      as fotos da Galeria e os preços dos cardápios (aba Preços -> páginas com simulador)
 #   2. TRAVA: confere que nenhuma URL mudou (se mudou, para tudo)
 #   3. grava a mudança no histórico (commit na main, autor "Painel do Chef")
 #   4. envia para a HostGator e confere as 53 URLs no ar (publicar-hostgator.yml)
@@ -45,6 +46,12 @@ jobs:
       - name: Aplicar as fotos novas da Galeria
         run: node gerador-painel/aplicar-galeria.mjs .
 
+      - name: Testes do motor de preços (se falhar, nada é publicado)
+        run: node --test gerador-painel/testes/*.test.mjs
+
+      - name: Aplicar os preços dos cardápios salvos no painel (gera as páginas de cardápio)
+        run: node gerador-painel/aplicar-precos.mjs .
+
       - name: TRAVA - nenhuma URL pode mudar
         run: node .github/travas/verificar-site.mjs
 
@@ -55,7 +62,7 @@ jobs:
         run: |
           git config user.name "Painel do Chef"
           git config user.email "painel@dfariagastronomia.com.br"
-          git add assets/tema.css gerador-cardapios/molde/estilos.html assets/galeria
+          git add assets/tema.css gerador-cardapios/molde/estilos.html assets/galeria gerador-cardapios/cardapios.json assets/precos-cardapios.json
           git add -u -- '*.html'
           if git diff --cached --quiet; then
             echo "Nada mudou no tema; publica assim mesmo (pode haver outras mudanças já na main)."

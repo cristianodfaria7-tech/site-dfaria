@@ -230,4 +230,9 @@ for (const cat of dados.lista.categorias) for (const s of cat.cardapios) if (!po
 fs.mkdirSync(path.join(saida, 'cardapios'), { recursive: true });
 fs.writeFileSync(path.join(saida, 'cardapios.html'), paginaLista(dados.lista));
 for (const c of dados.cardapios) fs.writeFileSync(path.join(saida, 'cardapios', `${c.slug}.html`), paginaCardapio(c));
+// preços que estão no site (o painel usa como ponto de partida)
+const precosNoAr = {};
+for (const c of dados.cardapios) if (c.preco && (c.preco.p100 || c.preco.churrasco)) precosNoAr[c.slug] = { ...(c.preco.p100 ? { p100: c.preco.p100 } : {}), churrasco: !!c.preco.churrasco };
+fs.mkdirSync(path.join(saida, 'assets'), { recursive: true });
+fs.writeFileSync(path.join(saida, 'assets', 'precos-cardapios.json'), JSON.stringify({ cardapios: precosNoAr }, null, 2) + '\n');
 console.log(`geradas: cardapios.html + ${dados.cardapios.length} páginas em cardapios/ (script ${js[0]})`);

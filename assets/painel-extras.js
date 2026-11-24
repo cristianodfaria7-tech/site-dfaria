@@ -69,7 +69,7 @@ export function botoesCabecalho() {
     </button>`;
   const galeria = b('btn-toggle-galeria', 'galeria', 'images', 'Galeria');
   if (s.papel !== 'dono') return galeria;
-  return galeria + b('btn-toggle-aparencia', 'aparencia', 'palette', 'Aparência') + b('btn-toggle-config', 'config', 'settings', 'Configurações');
+  return b('btn-toggle-precos', 'precos', 'calculator', 'Preços') + galeria + b('btn-toggle-aparencia', 'aparencia', 'palette', 'Aparência') + b('btn-toggle-config', 'config', 'settings', 'Configurações');
 }
 
 export function botaoPublicar() {
@@ -155,7 +155,154 @@ export function renderCorpo() {
   if (s.viewMode === 'aparencia') return renderAparencia();
   if (s.viewMode === 'config') return renderConfig();
   if (s.viewMode === 'galeria') return renderGaleria();
+  if (s.viewMode === 'precos') return renderPrecos();
   return '';
+}
+
+/* ---------- Preços dos cardápios (só Dono) ----------
+   O dono digita só o valor por pessoa para 100 convidados. O motor (assets/motor-precos.js,
+   o MESMO usado no site) calcula 30..100 na hora. Salvo em site_catalog_config id='precos'.
+   "Publicar no site" gera as páginas com o "A partir de" e o simulador. */
+const P = () => window.DfPrecos;
+
+async function carregarPrecos() {
+  const s = ctx.state;
+  s.precos = null;
+  try {
+    if (!Array.isArray(s.menus) || !s.menus.length) {
+      const rm = await fetch(`${ctx.SUPABASE_URL}/rest/v1/site_menus?select=slug,nome,ordem&order=ordem.asc`, { headers: ctx.api.headers() });
+      s.menus = rm.ok ? await rm.json() : [];
+    }
+    const r = await fetch(`${ctx.SUPABASE_URL}/rest/v1/site_catalog_config?id=eq.precos&select=negocio`, { headers: ctx.api.headers() });
+    const l = r.ok ? await r.json() : [];
+    let cardapios = l[0] && l[0].negocio && l[0].negocio.cardapios;
+    let origem = 'painel';
+    if (!cardapios) {
+      // primeira vez: começa com o que já está no ar
+      origem = 'site';
+      try {
+        const rs = await fetch('/assets/precos-cardapios.json?t=' + Date.now(), { cache: 'no-store' });
+        cardapios = rs.ok ? (await rs.json()).cardapios : {};
+      } catch (e) { cardapios = {}; }
+    }
+    s.precos = { cardapios: cardapios || {}, origem, atualizado_em: l[0] && l[0].negocio && l[0].negocio.atualizado_em };
+  } catch (e) {
+    s.precos = { cardapios: {}, erro: 'Não consegui carregar os preços. Atualize a página.' };
+  }
+  if (s.viewMode === 'precos') ctx.render();
+}
+
+function linhaPreco(slug) {
+  const c = (ctx.state.precos.cardapios[slug]) || {};
+  if (c.p100 === undefined || c.p100 === null || c.p100 === '') return { vazio: true };
+  return P().calcularTabela(c.p100, { temChurrasco: !!c.churrasco });
+}
+
+function htmlPrevia(slug) {
+  const t = linhaPreco(slug);
+  if (t.vazio) return '<p class="text-xs text-stone-400">Sem valor: o cardápio fica no site sem preço (como hoje).</p>';
+  if (!t.ok) return `<p class="text-xs font-bold text-red-600">${esc(t.erros.join(' '))}</p>`;
+  const R = (v) => 'R$ ' + P().formatarReal(v);
+  const cel = t.faixas.map((f) => `
+    <div class="rounded-lg ${f.convidados === 100 ? 'bg-dfgreen text-white' : 'bg-dfsand/60 text-dfgreen'} px-2 py-1.5 text-center">
+      <div class="text-[10px] uppercase tracking-wide opacity-70">${f.convidados} pess.</div>
+      <div class="text-sm font-extrabold">${R(f.porPessoa)}</div>
+      <div class="text-[10px] opacity-70">${R(f.total)}</div>
+    </div>`).join('');
+  const a150 = t.acimaDe100.find((f) => f.convidados === 150);
+  return `<div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5">${cel}</div>
+    <p class="text-[11px] text-stone-500 mt-1.5">Margem com 100 pessoas: <b>${Math.round(t.margem100 * 100)}%</b>${a150 ? ` · 150 pessoas (só aqui no painel; no site aparece "Consulte-nos"): <b>${R(a150.porPessoa)}</b> por pessoa` : ''}${t.avisos.length ? ` · <span class="text-amber-700 font-bold">${esc(t.avisos.join(' '))}</span>` : ''}</p>`;
+}
+
+function renderPrecos() {
+  const s = ctx.state;
+  if (!P()) return '<main class="max-w-5xl mx-auto p-8"><p class="text-red-600 font-bold">O motor de preços não carregou. Atualize a página (Ctrl+F5).</p></main>';
+  if (!s.precos) return '<main class="max-w-5xl mx-auto p-8 text-center text-stone-500"><i data-lucide="loader-2" class="w-8 h-8 mx-auto animate-spin text-dfgold"></i><p class="mt-2">Carregando preços…</p></main>';
+  const menus = (s.menus || []).slice().sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+  const linhas = menus.map((m) => {
+    const c = s.precos.cardapios[m.slug] || {};
+    const v = c.p100 === undefined || c.p100 === null ? '' : String(c.p100).replace('.', ',');
+    return `
+      <div class="bg-white rounded-2xl border border-[#C5A880]/30 p-4 space-y-3" data-preco-linha="${esc(m.slug)}">
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="flex-1 min-w-[14rem]">
+            <p class="font-display font-bold text-dfgreen">${esc(m.nome)}</p>
+            <a class="text-[11px] text-stone-400 hover:underline" href="/cardapios/${esc(m.slug)}" target="_blank" rel="noopener">/cardapios/${esc(m.slug)}</a>
+          </div>
+          <label class="flex items-center gap-2 text-sm font-bold text-dfgreen">Valor por pessoa p/ 100 convidados
+            <span class="flex items-center rounded-xl border-2 border-dfgold bg-white px-2"><span class="text-stone-500">R$</span>
+              <input data-preco-valor="${esc(m.slug)}" value="${esc(v)}" inputmode="decimal" placeholder="—" class="w-24 py-1.5 px-1 text-lg font-extrabold text-dfgreen outline-none"></span>
+          </label>
+          <label class="flex items-center gap-1.5 text-xs text-stone-600"><input type="checkbox" data-preco-churrasco="${esc(m.slug)}" ${c.churrasco ? 'checked' : ''}> com churrasco (entra churrasqueiro)</label>
+        </div>
+        <div data-preco-previa="${esc(m.slug)}">${htmlPrevia(m.slug)}</div>
+      </div>`;
+  }).join('');
+  return `
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 w-full space-y-5 pb-28">
+      <div class="bg-dfgreen text-white rounded-3xl p-6 border border-dfgold/40 shadow-md">
+        <div class="flex items-center gap-2"><i data-lucide="calculator" class="w-5 h-5 text-dfgold"></i><h2 class="font-display font-bold text-xl">Preços dos cardápios</h2></div>
+        <p class="text-xs text-white/80 mt-1">Digite só o <b>valor por pessoa para 100 convidados</b>. O motor calcula na hora os preços de 30 a 100 convidados (o mesmo cálculo do site). Estrutura, equipamento, equipe e deslocamento já estão dentro do valor. Deixe em branco para o cardápio ficar sem preço.</p>
+        <p class="text-xs text-white/80 mt-2"><b>1.</b> Ajuste os valores → <b>2.</b> <b>Salvar preços</b> → <b>3.</b> <b>Publicar no site</b> (1 a 3 minutos).</p>
+        ${s.precos.origem === 'site' ? '<p class="text-xs text-dfgold mt-2">Valores iniciais trazidos do site no ar.</p>' : ''}
+        ${s.precos.erro ? `<p class="text-xs text-red-200 font-bold mt-2">${esc(s.precos.erro)}</p>` : ''}
+      </div>
+      <div class="space-y-3">${linhas || '<p class="text-stone-500">Nenhum cardápio encontrado.</p>'}</div>
+      <div class="sticky bottom-20 flex justify-end">
+        <button id="btn-salvar-precos" class="inline-flex items-center gap-2 py-3 px-6 rounded-2xl bg-dfgreen text-white font-extrabold shadow-xl hover:bg-[#0f2118] ${s.precosSalvando ? 'opacity-70 cursor-wait' : ''}" ${s.precosSalvando ? 'disabled' : ''}>
+          <i data-lucide="${s.precosSalvando ? 'loader-2' : 'save'}" class="w-5 h-5 ${s.precosSalvando ? 'animate-spin' : ''}"></i>${s.precosSalvando ? 'Salvando…' : 'Salvar preços'}
+        </button>
+      </div>
+    </main>`;
+}
+
+function ligarPrecos() {
+  const s = ctx.state;
+  const atual = (slug) => (s.precos.cardapios[slug] = s.precos.cardapios[slug] || {});
+  const redesenhar = (slug) => { const d = document.querySelector(`[data-preco-previa="${slug}"]`); if (d) d.innerHTML = htmlPrevia(slug); };
+  document.querySelectorAll('[data-preco-valor]').forEach((inp) => {
+    inp.oninput = () => {
+      const slug = inp.getAttribute('data-preco-valor');
+      const txt = inp.value.trim();
+      const c = atual(slug);
+      if (txt === '') delete c.p100; else c.p100 = P().numero(txt);
+      s.precosAlterados = true;
+      redesenhar(slug);
+    };
+  });
+  document.querySelectorAll('[data-preco-churrasco]').forEach((cb) => {
+    cb.onchange = () => { const slug = cb.getAttribute('data-preco-churrasco'); atual(slug).churrasco = cb.checked; s.precosAlterados = true; redesenhar(slug); };
+  });
+  const b = document.getElementById('btn-salvar-precos');
+  if (b) b.onclick = salvarPrecos;
+}
+
+async function salvarPrecos() {
+  const s = ctx.state;
+  const limpos = {}, erros = [];
+  (s.menus || []).forEach((m) => {
+    const c = s.precos.cardapios[m.slug];
+    if (!c || c.p100 === undefined || c.p100 === null || c.p100 === '') { if (c && c.churrasco) limpos[m.slug] = { churrasco: true }; return; }
+    const t = P().calcularTabela(c.p100, { temChurrasco: !!c.churrasco });
+    if (!t.ok) erros.push(m.nome + ': ' + t.erros[0]); else limpos[m.slug] = { p100: t.p100, churrasco: !!c.churrasco };
+  });
+  if (erros.length) { toast('error', 'Corrija antes de salvar — ' + erros[0], 8000); return; }
+  s.precosSalvando = true; ctx.render();
+  const corpo = { id: 'precos', negocio: { cardapios: limpos, motor: 1, atualizado_por: s.user && s.user.email, atualizado_em: new Date().toISOString() }, updated_at: new Date().toISOString() };
+  let ok = false;
+  try {
+    const r = await fetch(`${ctx.SUPABASE_URL}/rest/v1/site_catalog_config?on_conflict=id`, {
+      method: 'POST', headers: { ...ctx.api.headers(), Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(corpo)
+    });
+    ok = r.ok;
+    if (!ok) toast('error', 'Não consegui salvar os preços (' + r.status + '). Nada foi alterado no site.', 8000);
+  } catch (e) { toast('error', 'Sem conexão: os preços não foram salvos.', 8000); }
+  s.precosSalvando = false;
+  if (ok) {
+    s.precos.cardapios = limpos; s.precos.origem = 'painel'; s.precosAlterados = false;
+    toast('success', 'Preços salvos! Agora clique em "Publicar no site" para levar ao ar.', 7000);
+  }
+  ctx.render();
 }
 
 /* ---------- Galeria: enviar fotos ---------- */
@@ -660,7 +807,9 @@ export function ligarEventos() {
   on('btn-toggle-aparencia', () => { s.viewMode = 'aparencia'; if (!s.temaRascunho) s.temaRascunho = T().normalizar(s.temaSalvo); ctx.render(); });
   on('btn-toggle-config', () => { s.viewMode = 'config'; s.usuarios = null; ctx.render(); carregarUsuarios(); });
   on('btn-toggle-galeria', () => { s.viewMode = 'galeria'; if (!s.galeria) { ctx.render(); carregarGaleria(); } else ctx.render(); });
+  on('btn-toggle-precos', () => { s.viewMode = 'precos'; ctx.render(); carregarPrecos(); });
   if (s.viewMode === 'galeria') ligarGaleria();
+  if (s.viewMode === 'precos' && s.precos) ligarPrecos();
   ligarBotoesPublicar();
   if (s.viewMode === 'aparencia') {
     ligarAparencia();
