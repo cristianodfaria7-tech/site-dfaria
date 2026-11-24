@@ -42,6 +42,9 @@ jobs:
       - name: Aplicar o tema (cores e fontes) salvo no painel
         run: node gerador-painel/aplicar-tema.mjs .
 
+      - name: Aplicar as fotos novas da Galeria
+        run: node gerador-painel/aplicar-galeria.mjs .
+
       - name: TRAVA - nenhuma URL pode mudar
         run: node .github/travas/verificar-site.mjs
 
@@ -52,7 +55,7 @@ jobs:
         run: |
           git config user.name "Painel do Chef"
           git config user.email "painel@dfariagastronomia.com.br"
-          git add assets/tema.css gerador-cardapios/molde/estilos.html
+          git add assets/tema.css gerador-cardapios/molde/estilos.html assets/galeria
           git add -u -- '*.html'
           if git diff --cached --quiet; then
             echo "Nada mudou no tema; publica assim mesmo (pode haver outras mudanças já na main)."

@@ -2,7 +2,7 @@
 // Gerencia 100% dos Cardápios Oficiais (17 itens) e Páginas do Site (19 páginas)
 // URL: /painel | Privado, Seguro (Supabase Auth), Responsivo e Simples (Regra Zero)
 
-import * as extras from './painel-extras.js?v=20261124c';
+import * as extras from './painel-extras.js?v=20261124d';
 
 const SUPABASE_URL = 'https://gcwxhawqvtqhpoohihjo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_yeda5BcY2QZyBoVMi4r_0Q_Hbxc5Ex2';

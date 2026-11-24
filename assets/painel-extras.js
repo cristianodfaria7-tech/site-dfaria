@@ -63,12 +63,13 @@ export async function carregarTema() {
 /* ===================== Cabeçalho: botões extras ===================== */
 export function botoesCabecalho() {
   const s = ctx.state;
-  if (s.papel !== 'dono') return '';
   const b = (id, modo, icone, txt) => `
     <button id="${id}" class="py-1.5 px-3 rounded-lg transition-all flex items-center gap-1.5 ${s.viewMode === modo ? 'bg-dfgold text-dfgreen shadow-sm' : 'text-white/80 hover:text-white'}">
       <i data-lucide="${icone}" class="w-3.5 h-3.5"></i><span>${txt}</span>
     </button>`;
-  return b('btn-toggle-aparencia', 'aparencia', 'palette', 'Aparência') + b('btn-toggle-config', 'config', 'settings', 'Configurações');
+  const galeria = b('btn-toggle-galeria', 'galeria', 'images', 'Galeria');
+  if (s.papel !== 'dono') return galeria;
+  return galeria + b('btn-toggle-aparencia', 'aparencia', 'palette', 'Aparência') + b('btn-toggle-config', 'config', 'settings', 'Configurações');
 }
 
 export function botaoPublicar() {
@@ -153,7 +154,180 @@ export function renderCorpo() {
   const s = ctx.state;
   if (s.viewMode === 'aparencia') return renderAparencia();
   if (s.viewMode === 'config') return renderConfig();
+  if (s.viewMode === 'galeria') return renderGaleria();
   return '';
+}
+
+/* ---------- Galeria: enviar fotos ---------- */
+const CATEGORIAS_GALERIA = ['Celebrações', 'Montagem', 'Churrasco', 'Ilhas de Frios e Finger Foods', 'Finger Foods', 'Corporativo', 'Equipe'];
+const urlFoto = (nome) => `${ctx.SUPABASE_URL}/storage/v1/object/public/dfaria-midia/galeria/${encodeURIComponent(nome)}`;
+
+async function carregarGaleria() {
+  const s = ctx.state;
+  try {
+    const r = await fetch(`${ctx.SUPABASE_URL}/rest/v1/site_catalog_config?id=eq.galeria&select=negocio`, { headers: ctx.api.headers() });
+    const l = r.ok ? await r.json() : [];
+    s.galeria = (l[0] && l[0].negocio && Array.isArray(l[0].negocio.fotos)) ? l[0].negocio : { fotos: [] };
+  } catch (e) { s.galeria = { fotos: [], erro: 'Não consegui carregar a galeria.' }; }
+  if (s.viewMode === 'galeria') ctx.render();
+}
+
+async function salvarGaleria(msg) {
+  const s = ctx.state;
+  const corpo = { id: 'galeria', negocio: { fotos: s.galeria.fotos, atualizado_por: s.user && s.user.email, atualizado_em: new Date().toISOString() }, updated_at: new Date().toISOString() };
+  const r = await fetch(`${ctx.SUPABASE_URL}/rest/v1/site_catalog_config?on_conflict=id`, {
+    method: 'POST', headers: { ...ctx.api.headers(), Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(corpo)
+  });
+  if (!r.ok) { toast('error', 'Não consegui salvar a galeria (' + r.status + ').'); return false; }
+  s.galeriaSalvaEm = Date.now();
+  if (msg) toast('success', msg);
+  return true;
+}
+
+async function subirArquivo(nome, blob) {
+  const r = await fetch(`${ctx.SUPABASE_URL}/storage/v1/object/dfaria-midia/galeria/${encodeURIComponent(nome)}`, {
+    method: 'POST', headers: { apikey: ctx.SUPABASE_KEY, Authorization: 'Bearer ' + ctx.state.token, 'Content-Type': blob.type, 'x-upsert': 'true' }, body: blob
+  });
+  if (!r.ok) {
+    let t = ''; try { t = (await r.json()).message || ''; } catch (e) {}
+    if (/bucket not found/i.test(t)) throw new Error('A pasta de fotos (dfaria-midia) não existe no Supabase. Avise o Claude.');
+    throw new Error('Falha ao enviar a foto (' + r.status + ') ' + t);
+  }
+}
+
+async function enviarFotos(arquivos) {
+  const s = ctx.state;
+  const lista = Array.from(arquivos).filter((f) => /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(f.name));
+  if (!lista.length) { toast('error', 'Escolha arquivos de foto (JPG, PNG ou WebP).'); return; }
+  s.galEnviando = { total: lista.length, feitas: 0, erros: [] };
+  ctx.render();
+  for (const f of lista) {
+    try {
+      const base = new Date().toISOString().replace(/\D/g, '').slice(0, 14) + '-' + Math.random().toString(36).slice(2, 7);
+      const tratada = await window.DfFoto.preparar(f, { tratar: true });
+      const original = await window.DfFoto.preparar(f, { tratar: false });
+      const ext = tratada.tipo === 'image/webp' ? 'webp' : 'jpg';
+      const nomeT = `dfaria-${base}.${ext}`, nomeO = `dfaria-${base}-original.${ext}`;
+      await subirArquivo(nomeT, tratada.blob);
+      await subirArquivo(nomeO, original.blob);
+      URL.revokeObjectURL(tratada.url); URL.revokeObjectURL(original.url);
+      s.galeria.fotos.unshift({
+        arquivo: nomeT, arquivoTratado: nomeT, arquivoOriginal: nomeO, tratada: true,
+        legenda: '', categoria: s.galCategoriaPadrao || 'Celebrações',
+        largura: tratada.largura, altura: tratada.altura, enviada_em: new Date().toISOString()
+      });
+      await salvarGaleria();
+    } catch (e) { s.galEnviando.erros.push(f.name + ': ' + e.message); }
+    s.galEnviando.feitas++;
+    ctx.render();
+  }
+  const erros = s.galEnviando.erros;
+  s.galEnviando = null;
+  if (erros.length) toast('error', erros.length + ' foto(s) não subiram. ' + erros[0], 8000);
+  else toast('success', lista.length + ' foto(s) enviada(s) e tratada(s). Escreva as legendas e clique em “Publicar no site”.', 7000);
+}
+
+function renderGaleria() {
+  const s = ctx.state;
+  const g = s.galeria;
+  const env = s.galEnviando;
+  const semLegenda = g ? g.fotos.filter((f) => !String(f.legenda || '').trim()).length : 0;
+  return `
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 w-full space-y-6 pb-28">
+      <div class="bg-dfgreen text-white rounded-3xl p-6 border border-dfgold/40 shadow-md">
+        <div class="flex items-center gap-2"><i data-lucide="images" class="w-5 h-5 text-dfgold"></i><h2 class="font-display font-bold text-xl">Fotos novas da Galeria</h2></div>
+        <p class="text-xs text-white/80 mt-1">As fotos enviadas aqui entram <b>no topo</b> da página Galeria, as mais recentes primeiro. Cada foto recebe um <b>tratamento automático de luz e cor</b> (como na edição de um fotógrafo, sem mudar nada da cena) e fica leve para o site. Depois clique em <b>Publicar no site</b>.</p>
+      </div>
+
+      <label id="gal-drop" class="block bg-white rounded-3xl border-2 border-dashed border-[#C5A880]/70 hover:border-dfgreen hover:bg-dfsand/40 transition-colors p-8 text-center cursor-pointer ${env ? 'pointer-events-none opacity-70' : ''}">
+        <input id="gal-arquivos" type="file" accept="image/*" multiple class="hidden">
+        ${env ? `
+          <i data-lucide="loader-2" class="w-10 h-10 mx-auto text-dfgold animate-spin"></i>
+          <p class="mt-3 font-display font-bold text-dfgreen">Tratando e enviando… ${env.feitas} de ${env.total}</p>
+          <div class="mt-3 h-2 max-w-sm mx-auto bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-dfgold transition-all" style="width:${Math.round(env.feitas / env.total * 100)}%"></div></div>
+        ` : `
+          <i data-lucide="image-plus" class="w-10 h-10 mx-auto text-dfgold"></i>
+          <p class="mt-3 font-display font-bold text-lg text-dfgreen">Arraste as fotos aqui ou clique para escolher</p>
+          <p class="text-xs text-stone-500 mt-1">Pode escolher várias de uma vez. No celular, abre a galeria do aparelho.</p>
+        `}
+      </label>
+      <div class="flex flex-wrap items-center gap-2 text-xs text-stone-600">
+        <span class="font-bold">Categoria para as próximas fotos:</span>
+        <select id="gal-cat-padrao" class="border border-stone-200 rounded-lg py-1.5 px-2 bg-white">
+          ${CATEGORIAS_GALERIA.map((c) => `<option ${c === (s.galCategoriaPadrao || 'Celebrações') ? 'selected' : ''}>${esc(c)}</option>`).join('')}
+        </select>
+      </div>
+
+      ${!g ? '<p class="text-sm text-stone-500 flex items-center gap-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Carregando…</p>' : g.erro ? `<p class="text-sm text-red-600">${esc(g.erro)}</p>` : !g.fotos.length ? '<p class="text-sm text-stone-500 text-center py-6">Nenhuma foto nova ainda. As 56 fotos atuais da galeria continuam no site.</p>' : `
+      ${semLegenda ? `<p class="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">${semLegenda} foto(s) sem legenda. Uma frase curta ajuda o Google a mostrar suas fotos (ex.: “Mesa de casamento com flores brancas em Tatuí”).</p>` : ''}
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        ${g.fotos.map((f, i) => `
+          <div class="bg-white rounded-3xl border border-[#C5A880]/30 shadow-sm overflow-hidden flex flex-col">
+            <div class="relative aspect-[4/3] bg-stone-100">
+              <img src="${urlFoto(f.arquivo)}" alt="" class="w-full h-full object-cover" loading="lazy">
+              <span class="absolute top-2 left-2 text-[10px] font-bold px-2 py-1 rounded-full ${f.tratada ? 'bg-dfgold text-dfgreen' : 'bg-white/90 text-stone-600'}">${f.tratada ? '✨ Tratada' : 'Original'}</span>
+              ${i === 0 ? '<span class="absolute top-2 right-2 text-[10px] font-bold px-2 py-1 rounded-full bg-dfgreen text-white">1ª da galeria</span>' : ''}
+            </div>
+            <div class="p-4 space-y-3 flex-1 flex flex-col">
+              <input class="gal-legenda w-full py-2 px-3 rounded-xl border ${String(f.legenda || '').trim() ? 'border-stone-200' : 'border-amber-300'} text-sm" data-i="${i}" maxlength="140" placeholder="Legenda (ex.: Mesa posta para casamento)" value="${esc(f.legenda)}">
+              <select class="gal-categoria w-full py-2 px-3 rounded-xl border border-stone-200 text-sm" data-i="${i}">
+                ${CATEGORIAS_GALERIA.map((c) => `<option ${c === f.categoria ? 'selected' : ''}>${esc(c)}</option>`).join('')}
+              </select>
+              <div class="mt-auto flex items-center gap-1.5 pt-1">
+                <button class="gal-trat flex-1 text-[11px] font-bold py-2 rounded-lg border ${f.tratada ? 'border-dfgold text-dfgreen bg-dfsand' : 'border-stone-200 text-stone-500'}" data-i="${i}" title="Alternar entre a foto tratada e a original">${f.tratada ? 'Usar a original' : 'Usar a tratada ✨'}</button>
+                <button class="gal-sobe p-2 rounded-lg border border-stone-200 text-stone-500 hover:text-dfgreen ${i === 0 ? 'invisible' : ''}" data-i="${i}" title="Mover para antes"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
+                <button class="gal-desce p-2 rounded-lg border border-stone-200 text-stone-500 hover:text-dfgreen ${i === g.fotos.length - 1 ? 'invisible' : ''}" data-i="${i}" title="Mover para depois"><i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                <button class="gal-remover p-2 rounded-lg border border-stone-200 text-stone-400 hover:text-red-600 hover:bg-red-50" data-i="${i}" title="Tirar da galeria"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>`}
+      ${s.confirmar ? modalConfirmar(s.confirmar) : ''}
+    </main>`;
+}
+
+function ligarGaleria() {
+  const s = ctx.state;
+  const input = document.getElementById('gal-arquivos');
+  if (input) input.onchange = () => { if (input.files.length) enviarFotos(input.files); };
+  const drop = document.getElementById('gal-drop');
+  if (drop) {
+    drop.ondragover = (e) => { e.preventDefault(); drop.classList.add('border-dfgreen', 'bg-dfsand/40'); };
+    drop.ondragleave = () => drop.classList.remove('border-dfgreen', 'bg-dfsand/40');
+    drop.ondrop = (e) => { e.preventDefault(); if (e.dataTransfer.files.length) enviarFotos(e.dataTransfer.files); };
+  }
+  const cat = document.getElementById('gal-cat-padrao');
+  if (cat) cat.onchange = () => { s.galCategoriaPadrao = cat.value; };
+  let espera = null;
+  const salvarDepois = () => { clearTimeout(espera); espera = setTimeout(() => salvarGaleria(), 700); };
+  document.querySelectorAll('.gal-legenda').forEach((el) => {
+    el.oninput = () => { s.galeria.fotos[+el.dataset.i].legenda = el.value; el.classList.toggle('border-amber-300', !el.value.trim()); salvarDepois(); };
+  });
+  document.querySelectorAll('.gal-categoria').forEach((el) => {
+    el.onchange = () => { s.galeria.fotos[+el.dataset.i].categoria = el.value; salvarGaleria(); };
+  });
+  const mover = (i, d) => { const f = s.galeria.fotos; const j = i + d; if (j < 0 || j >= f.length) return; [f[i], f[j]] = [f[j], f[i]]; salvarGaleria(); ctx.render(); };
+  document.querySelectorAll('.gal-sobe').forEach((b) => b.onclick = () => mover(+b.dataset.i, -1));
+  document.querySelectorAll('.gal-desce').forEach((b) => b.onclick = () => mover(+b.dataset.i, 1));
+  document.querySelectorAll('.gal-trat').forEach((b) => b.onclick = () => {
+    const f = s.galeria.fotos[+b.dataset.i];
+    if (!f.arquivoOriginal) return;
+    f.tratada = !f.tratada; f.arquivo = f.tratada ? f.arquivoTratado : f.arquivoOriginal;
+    salvarGaleria(); ctx.render();
+  });
+  document.querySelectorAll('.gal-remover').forEach((b) => b.onclick = () => {
+    s.confirmar = { titulo: 'Tirar esta foto da galeria?', texto: 'Ela sai do site na próxima publicação. As outras fotos não mudam.', botao: 'Tirar da galeria', acao: 'galeria-remover', i: +b.dataset.i };
+    ctx.render();
+  });
+  const nao = document.getElementById('modal-nao');
+  if (nao) nao.onclick = () => { s.confirmar = null; ctx.render(); };
+  const sim = document.getElementById('modal-sim');
+  if (sim && s.confirmar && s.confirmar.acao === 'galeria-remover') sim.onclick = async () => {
+    const i = s.confirmar.i; s.confirmar = null;
+    s.galeria.fotos.splice(i, 1);
+    await salvarGaleria('Foto retirada. Clique em “Publicar no site” para sair do site.');
+    ctx.render();
+  };
 }
 
 /* ---------- Aparência ---------- */
@@ -485,6 +659,8 @@ export function ligarEventos() {
   const on = (id, fn) => { const e = document.getElementById(id); if (e) e.onclick = fn; };
   on('btn-toggle-aparencia', () => { s.viewMode = 'aparencia'; if (!s.temaRascunho) s.temaRascunho = T().normalizar(s.temaSalvo); ctx.render(); });
   on('btn-toggle-config', () => { s.viewMode = 'config'; s.usuarios = null; ctx.render(); carregarUsuarios(); });
+  on('btn-toggle-galeria', () => { s.viewMode = 'galeria'; if (!s.galeria) { ctx.render(); carregarGaleria(); } else ctx.render(); });
+  if (s.viewMode === 'galeria') ligarGaleria();
   ligarBotoesPublicar();
   if (s.viewMode === 'aparencia') {
     ligarAparencia();
