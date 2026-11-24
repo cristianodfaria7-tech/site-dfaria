@@ -3,6 +3,10 @@
    Depende de /assets/tema-gerador.js (window.DfTema), carregado no painel.html. */
 
 let ctx = null; // { state, api, render, SUPABASE_URL, SUPABASE_KEY }
+
+// Endereço (slug) de cada Edge Function no Supabase. O painel do Supabase deu nome automático
+// à função de publicar ("rapid-api"); o nome exibido lá é "painel-publicar".
+const FUNCOES = { 'painel-publicar': 'rapid-api', 'painel-usuarios': 'painel-usuarios' };
 const T = () => window.DfTema;
 
 export function escaparHtml(v) {
@@ -18,7 +22,7 @@ function toast(type, text, ms = 4500) {
 }
 
 async function chamarFuncao(nome, corpo) {
-  const r = await fetch(`${ctx.SUPABASE_URL}/functions/v1/${nome}`, {
+  const r = await fetch(`${ctx.SUPABASE_URL}/functions/v1/${FUNCOES[nome] || nome}`, {
     method: 'POST',
     headers: { apikey: ctx.SUPABASE_KEY, Authorization: 'Bearer ' + ctx.state.token, 'Content-Type': 'application/json' },
     body: JSON.stringify(corpo || {})
