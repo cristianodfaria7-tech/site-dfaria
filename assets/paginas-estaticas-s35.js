@@ -322,6 +322,17 @@
   var SUPABASE_URL = 'https://gcwxhawqvtqhpoohihjo.supabase.co';
   var SUPABASE_KEY = 'sb_publishable_yeda5BcY2QZyBoVMi4r_0Q_Hbxc5Ex2';
 
+  // Troca a foto pela do painel SÓ se a nova carregar. Se o endereço do painel estiver
+  // errado (404), a foto que já está na página continua (evita foto quebrada).
+  function trocarFotoSeCarregar(el, novaUrl, novoAlt) {
+    if (!el || !novaUrl) return;
+    var atual = el.getAttribute('src') || '';
+    if (atual === novaUrl || el.src === novaUrl) { if (novoAlt) el.alt = novoAlt; return; }
+    var teste = new Image();
+    teste.onload = function () { el.src = novaUrl; if (novoAlt) el.alt = novoAlt; };
+    teste.src = novaUrl;
+  }
+
   function sincAoVivo() {
     var path = location.pathname.replace(/\/$/, '');
     var matchCardapio = path.match(/^\/cardapios\/([a-z0-9-]+)$/);
@@ -356,8 +367,7 @@
         // 4. Foto de Capa
         var img = document.querySelector('img.df-unified-backdrop');
         if (img && menu.foto_capa && menu.foto_capa.src) {
-          img.src = menu.foto_capa.src;
-          if (menu.foto_capa.alt) img.alt = menu.foto_capa.alt;
+          trocarFotoSeCarregar(img, menu.foto_capa.src, menu.foto_capa.alt);
         }
 
         // 5. Seções e Pratos
@@ -390,7 +400,7 @@
           var p = link.querySelector('p');
           if (p && m.cartao && m.cartao.resumo) p.textContent = m.cartao.resumo;
           var im = link.querySelector('img');
-          if (im && m.cartao && m.cartao.imagem && m.cartao.imagem.src) im.src = m.cartao.imagem.src;
+          if (im && m.cartao && m.cartao.imagem && m.cartao.imagem.src) trocarFotoSeCarregar(im, m.cartao.imagem.src);
         });
       })
       ['catch'](function () {});
