@@ -2,8 +2,11 @@
 //   node .github/travas/verificar-seo-no-ar.mjs [https://dfariagastronomia.com.br]
 //
 // Criada no incidente de indexação de 26/11/2026. Falha (exit 1) se:
-//  - robots.txt: inacessível, bloqueando o site inteiro, deixando o /painel aberto ou
-//    bloqueando alguma URL do sitemap;
+//  - robots.txt: inacessível, bloqueando o site inteiro, bloqueando o /painel (o Google
+//    precisa rastreá-lo para ler o noindex) ou bloqueando alguma URL do sitemap;
+//  - /painel e /painel.html sem noindex no HTML e no cabeçalho X-Robots-Tag (e esse
+//    cabeçalho vazando para páginas comerciais);
+//  - sitemap com lastmod ausente, inválido ou no futuro;
 //  - sitemap: fora do ar, URL duplicada, fora do host oficial, com $slug, que redireciona,
 //    que não dá 200, sem canonical própria, com noindex, sem <title> ou sem <h1>;
 //  - endereços antigos (regiões, /index.html, redirects de sempre): mais de 1 salto,
@@ -59,7 +62,7 @@ const robots = await rRobots.text();
 const disallow = robots.split(/\r?\n/).filter((l) => /^\s*disallow\s*:/i.test(l)).map((l) => l.split(':').slice(1).join(':').trim());
 if (rRobots.status !== 200) erro(`robots.txt respondeu ${rRobots.status}`); else ok('robots.txt 200');
 if (disallow.includes('/')) erro('robots.txt bloqueia o site inteiro (Disallow: /)'); else ok('não bloqueia o site inteiro');
-if (!disallow.some((d) => d === '/painel')) erro('robots.txt não protege /painel'); else ok('/painel protegido');
+if (disallow.some((d) => d && '/painel'.startsWith(d))) erro('robots.txt bloqueia /painel: o Google não consegue ler o noindex'); else ok('/painel rastreável (o Google lê o noindex)');
 if (!/^sitemap:\s*https:\/\/dfariagastronomia\.com\.br\/sitemap\.xml/im.test(robots)) erro('robots.txt sem a linha Sitemap'); else ok('linha Sitemap presente');
 
 console.log('\n== sitemap.xml');
@@ -119,9 +122,27 @@ if (r404.status !== 404) erro(`página inexistente respondeu ${r404.status}`); e
 
 const p404 = await (await pedir(BASE + '/404.html')).text();
 if (!/<meta[^>]+name=["']robots["'][^>]*noindex/i.test(p404)) erro('404.html sem noindex'); else ok('404.html com noindex');
-const painel = await pedir(BASE + '/painel');
-const painelHtml = painel.status === 200 ? await painel.text() : '';
-if (painel.status === 200 && !/noindex/i.test(painelHtml)) erro('/painel sem noindex'); else ok('/painel privado (noindex + robots)');
+for (const c of ['/painel', '/painel.html']) {
+  const painel = await pedir(BASE + c);
+  const painelHtml = painel.status === 200 ? await painel.text() : '';
+  const xrt = painel.headers.get('x-robots-tag') || '';
+  if (painel.status !== 200) erro(`${c} respondeu ${painel.status}`);
+  else if (!/<meta[^>]+name=["']robots["'][^>]*noindex/i.test(painelHtml)) erro(`${c} sem meta noindex`);
+  else if (!/noindex/i.test(xrt)) erro(`${c} sem cabeçalho X-Robots-Tag noindex`);
+  else ok(`${c}: noindex no HTML e no cabeçalho`);
+}
+// o cabeçalho noindex do painel não pode vazar para páginas comerciais
+for (const u of [BASE + '/', locs.find((x) => /cardapios\//.test(x))].filter(Boolean)) {
+  const r = await pedir(u);
+  if (/noindex/i.test(r.headers.get('x-robots-tag') || '')) erro(`${dec(u)} recebeu X-Robots-Tag noindex`); else ok(`${dec(u)} sem X-Robots-Tag noindex`);
+}
+// lastmod: formato válido e nunca no futuro
+const hoje = new Date().toISOString().slice(0, 10);
+const lms = [...sm.matchAll(/<lastmod>([^<]*)<\/lastmod>/g)].map((m) => m[1]);
+const lmRuins = lms.filter((d) => !/^\d{4}-\d{2}-\d{2}$/.test(d) || d > hoje);
+if (lms.length !== locs.length) erro(`sitemap: ${locs.length - lms.length} URL(s) sem lastmod`);
+else if (lmRuins.length) erro('lastmod inválido ou no futuro: ' + lmRuins.join(', '));
+else ok(`lastmod presente e válido nas ${lms.length} URLs`);
 
 console.log('\n== Googlebot x navegador (mesma resposta)');
 for (const u of [locs[0], locs.find((x) => /buffet-em/.test(x)), locs.find((x) => /cardapios\//.test(x)), BASE + '/regioes-atendidas/tatui/'].filter(Boolean)) {

@@ -98,6 +98,12 @@ Header set Cache-Control "no-cache, no-store, must-revalidate"
 Header set Pragma "no-cache"
 Header set Expires "0"
 </FilesMatch>
+
+# Painel do Chef (/painel -> painel.html): o Google pode rastrear para LER o noindex,
+# mas nunca indexa. A proteção dos dados é o login do Supabase, não o robots.txt.
+<FilesMatch "^painel\.html$">
+Header set X-Robots-Tag "noindex, nofollow"
+</FilesMatch>
 </IfModule>
 
 # Proteção de arquivos sensíveis (robots.txt e sitemap.xml continuam públicos)

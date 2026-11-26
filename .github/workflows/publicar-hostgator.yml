@@ -52,6 +52,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref || github.sha }}
+          fetch-depth: 0  # histórico completo: o lastmod do sitemap vem da data do último commit de cada página
 
       - name: Conferir arquivos essenciais antes de publicar
         run: |
@@ -69,6 +70,12 @@ jobs:
 
       - name: TRAVA - nenhuma URL pode mudar (bloqueia a publicação se mudar)
         run: node .github/travas/verificar-site.mjs
+
+      - name: Sitemap - lastmod com a data real da última mudança de cada página
+        run: node .github/travas/atualizar-lastmod.mjs
+
+      - name: TRAVA SEO - robots, sitemap, noindex e regras do .htaccess (bloqueia a publicação)
+        run: node .github/travas/verificar-seo-local.mjs
 
       - name: Enviar para a HostGator por FTP seguro
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
