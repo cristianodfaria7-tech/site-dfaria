@@ -109,3 +109,6 @@ jobs:
           done
           if [ "$falhas" -gt 0 ]; then echo "::error::$falhas URL(s) com problema depois de publicar"; exit 1; fi
           echo "Todas as URLs travadas respondem 200."
+
+      - name: Conferir no ar - SEO (robots, sitemap, canonical, redirects antigos, 404/410)
+        run: node .github/travas/verificar-seo-no-ar.mjs
