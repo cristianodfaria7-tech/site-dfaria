@@ -694,16 +694,16 @@
       "resumo": "Opção clássica e querida, com receita especial de strogonoff e mesa completa de acompanhamentos.",
       "imagem": {
         "alt": "Buffet servindo strogonoff tradicional",
-        "src": "/__l5e/assets-v1/c9096b74-4b5b-4228-a5ad-e00947dbbb9e/rechauds-buffet-almoco-dfaria.webp",
-        "altura": 960,
-        "largura": 1280
+        "src": "/__l5e/assets-v1/01082954-1834-45ba-ac38-a766084ed011/strogonoff.webp",
+        "altura": 1024,
+        "largura": 1535
       },
       "cartao": {
         "imagem": {
           "alt": "Buffet servindo strogonoff tradicional",
-          "src": "/__l5e/assets-v1/c9096b74-4b5b-4228-a5ad-e00947dbbb9e/rechauds-buffet-almoco-dfaria.webp",
-          "altura": 960,
-          "largura": 1280
+          "src": "/__l5e/assets-v1/01082954-1834-45ba-ac38-a766084ed011/strogonoff.webp",
+          "altura": 1024,
+          "largura": 1535
         },
         "resumo": "Opção clássica e querida, com receita especial de strogonoff e mesa completa de acompanhamentos.",
         "titulo": "Jantar Tradicional com Strogonoff de Frango"
@@ -760,16 +760,16 @@
       "resumo": "Para eventos noturnos de prestígio: filé mignon, ave especial e massas frescas.",
       "imagem": {
         "alt": "Jantar nobre com carnes e massas",
-        "src": "/__l5e/assets-v1/c9096b74-4b5b-4228-a5ad-e00947dbbb9e/rechauds-buffet-almoco-dfaria.webp",
-        "altura": 960,
-        "largura": 1280
+        "src": "/__l5e/assets-v1/36214949-815e-48c9-9924-5fd1b74f2061/costela-em-cruz-brasa-dfaria.webp",
+        "altura": 1050,
+        "largura": 1400
       },
       "cartao": {
         "imagem": {
           "alt": "Jantar nobre com carnes e massas",
-          "src": "/__l5e/assets-v1/c9096b74-4b5b-4228-a5ad-e00947dbbb9e/rechauds-buffet-almoco-dfaria.webp",
-          "altura": 960,
-          "largura": 1280
+          "src": "/__l5e/assets-v1/4b0fee6a-35dd-4415-9b7e-6f3f8672aebd/jantar-massas.webp",
+          "altura": 1024,
+          "largura": 1536
         },
         "resumo": "Para eventos noturnos de prestígio: filé mignon, ave especial e massas frescas.",
         "titulo": "Jantar Completo — Seleção de Carnes e Massas"
@@ -823,14 +823,14 @@
       "resumo": "Gastronomia de alta celebração para casamentos e formaturas exigentes.",
       "imagem": {
         "alt": "Jantar de gala D’Faria",
-        "src": "/__l5e/assets-v1/c9096b74-4b5b-4228-a5ad-e00947dbbb9e/rechauds-buffet-almoco-dfaria.webp",
-        "altura": 960,
-        "largura": 1280
+        "src": "/__l5e/assets-v1/c0e064b2-86dc-4ca8-86ff-2ca80ee5b054/costela-de-chao-churrasco-dfaria.webp",
+        "altura": 1050,
+        "largura": 1400
       },
       "cartao": {
         "imagem": {
           "alt": "Jantar de gala D’Faria",
-          "src": "/__l5e/assets-v1/c9096b74-4b5b-4228-a5ad-e00947dbbb9e/rechauds-buffet-almoco-dfaria.webp",
+          "src": "/__l5e/assets-v1/6cbf4afb-394c-49ac-9703-8531354edc8e/jantar-especial.webp",
           "altura": 960,
           "largura": 1280
         },
@@ -935,16 +935,16 @@
       "resumo": "Uma cantina italiana no seu evento: massas frescas, molhos aromáticos e queijos especiais ralados na hora.",
       "imagem": {
         "alt": "Festival de massas frescas e molhos caseiros",
-        "src": "/__l5e/assets-v1/c9096b74-4b5b-4228-a5ad-e00947dbbb9e/rechauds-buffet-almoco-dfaria.webp",
-        "altura": 960,
-        "largura": 1280
+        "src": "/__l5e/assets-v1/325a03f4-d2d2-484f-b6ca-57f5bdce870d/batatas-ao-murro-legumes-dfaria.webp",
+        "altura": 1280,
+        "largura": 960
       },
       "cartao": {
         "imagem": {
           "alt": "Festival de massas frescas e molhos caseiros",
-          "src": "/__l5e/assets-v1/c9096b74-4b5b-4228-a5ad-e00947dbbb9e/rechauds-buffet-almoco-dfaria.webp",
-          "altura": 960,
-          "largura": 1280
+          "src": "/__l5e/assets-v1/6d2219e1-2249-40d1-bd24-6dd1d51fb2e4/festival-massas.webp",
+          "altura": 1024,
+          "largura": 1536
         },
         "resumo": "Uma cantina italiana no seu evento: massas frescas, molhos aromáticos e queijos especiais ralados na hora.",
         "titulo": "Festival de Massas"
